@@ -1,13 +1,14 @@
+
 import { View, Text} from "react-native";
 
-export default function DetalleComentario (){
+export default function ListarReserva (){
 
     return(
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center"}}>
-            <Text>Detalle Comentario</Text>
+            <Text>Listar Reservas</Text>
 
 
         </View>
     )
 
-}
+} 
