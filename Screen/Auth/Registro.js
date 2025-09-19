@@ -23,27 +23,27 @@ export default function Registro({ navigation }) {
 
         <Text style={styles.title}>Regístrate</Text>
         <Text style={styles.subtitle}>
-          Únete a <Text style={styles.appName}>World Travels</Text> y empieza a planear tus aventuras 🌍✈️
+          Únete a <Text style={styles.appName}>World Travels</Text> y empieza a planear tus aventuras.
         </Text>
 
         {/* Inputs */}
         <TextInput
           style={styles.input}
-          placeholder="👤 Nombre"
+          placeholder="Nombre"
           value={nombre}
           onChangeText={setNombre}
         />
 
         <TextInput
           style={styles.input}
-          placeholder="👤 Apellido"
+          placeholder="Apellido"
           value={apellido}
           onChangeText={setApellido}
         />
 
         <TextInput
           style={styles.input}
-          placeholder="✉️ Correo electrónico"
+          placeholder="Correo electrónico"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -52,7 +52,7 @@ export default function Registro({ navigation }) {
 
         <TextInput
           style={styles.input}
-          placeholder="🔒 Contraseña"
+          placeholder="Contraseña"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -60,7 +60,7 @@ export default function Registro({ navigation }) {
 
         <TextInput
           style={styles.input}
-          placeholder="📞 Teléfono"
+          placeholder="Teléfono"
           value={telefono}
           onChangeText={setTelefono}
           keyboardType="phone-pad"
@@ -68,14 +68,14 @@ export default function Registro({ navigation }) {
 
         <TextInput
           style={styles.input}
-          placeholder="🌎 Nacionalidad"
+          placeholder="Nacionalidad"
           value={nacionalidad}
           onChangeText={setNacionalidad}
         />
 
         <TextInput
           style={styles.input}
-          placeholder="📅 Fecha de registro (YYYY-MM-DD)"
+          placeholder=" Fecha de registro (YYYY-MM-DD)"
           value={fechaRegistro}
           onChangeText={setFechaRegistro}
         />

@@ -13,7 +13,7 @@ export default function Login({ navigation }) {
       <Text style={styles.subtitulo}>
         Tu compañero de confianza para planear y disfrutar tus viajes ✈️
       </Text>
-     <Text style={styles.subtitulo}>Inicia sesión para continuar</Text>
+     <Text style={styles.subtitulo}>Inicia sesión para continuar.</Text>
 
       <View style={styles.form}>
         <TextInput
