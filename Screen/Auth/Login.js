@@ -1,17 +1,34 @@
 import { TextInput, Text, View, StyleSheet } from "react-native";
 import BottonComponent from "../../Components/BottonComponents";
 import { useState } from "react";
+import { loginUser } from "../../Src/Navegation/Service/AuthService";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert('Por favor, ingresa email y contraseña.');
+      return;
+    }
+    setLoading(true);
+    const result = await loginUser(email, password);
+    setLoading(false);
+    if (result.success) {
+      alert('Login exitoso.');
+      navigation.navigate('Main');
+    } else {
+      alert('Error en login: ' + result.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>🌍 World Travels</Text>
+      <Text style={styles.titulo}> World Travels</Text>
       <Text style={styles.subtitulo}>
-        Tu compañero de confianza para planear y disfrutar tus viajes ✈️
+        Tu compañero de confianza para planear y disfrutar tus viajes 
       </Text>
      <Text style={styles.subtitulo}>Inicia sesión para continuar.</Text>
 
@@ -23,6 +40,7 @@ export default function Login({ navigation }) {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
+          editable={!loading}
         />
 
         <TextInput
@@ -34,7 +52,7 @@ export default function Login({ navigation }) {
           editable={!loading}
         />
 
-        <BottonComponent title="Iniciar Sesión" />
+        <BottonComponent title={loading ? "Iniciando..." : "Iniciar Sesión"} onPress={handleLogin} />
 
         <BottonComponent
           title="¿No tienes una cuenta? Regístrate"

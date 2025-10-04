@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView } from 'react-native';
 import BottonComponent from '../../Components/BottonComponents';
+import { registerUser } from '../../Src/Navegation/Service/AuthService';
 
 export default function Registro({ navigation }) {
   const [nombre, setNombre] = useState('');
@@ -10,16 +11,39 @@ export default function Registro({ navigation }) {
   const [password, setPassword] = useState('');
   const [nacionalidad, setNacionalidad] = useState('');
   const [fechaRegistro, setFechaRegistro] = useState('');
+  const [rol, setRol] = useState('usuario');
+  const [loading, setLoading] = useState(false);
+
+  const handleRegistro = async () => {
+    if (!nombre || !apellido || !email || !password) {
+      alert('Por favor, completa todos los campos obligatorios.');
+      return;
+    }
+    setLoading(true);
+    const userData = {
+      nombre,
+      apellido,
+      email,
+      telefono,
+      password,
+      nacionalidad,
+      fechaRegistro,
+      roles: rol
+    };
+    const result = await registerUser(userData);
+    setLoading(false);
+    if (result.success) {
+      alert('Registro exitoso. Ahora puedes iniciar sesión.');
+      navigation.navigate('Login');
+    } else {
+      alert('Error en el registro: ' + result.message);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         
-        {/* Imagen ilustrativa */}
-        <Image
-          source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3062/3062634.png' }}
-          style={styles.image}
-        />
 
         <Text style={styles.title}>Regístrate</Text>
         <Text style={styles.subtitle}>
@@ -32,6 +56,7 @@ export default function Registro({ navigation }) {
           placeholder="Nombre"
           value={nombre}
           onChangeText={setNombre}
+          editable={!loading}
         />
 
         <TextInput
@@ -39,6 +64,7 @@ export default function Registro({ navigation }) {
           placeholder="Apellido"
           value={apellido}
           onChangeText={setApellido}
+          editable={!loading}
         />
 
         <TextInput
@@ -48,6 +74,7 @@ export default function Registro({ navigation }) {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
+          editable={!loading}
         />
 
         <TextInput
@@ -56,6 +83,7 @@ export default function Registro({ navigation }) {
           secureTextEntry
           value={password}
           onChangeText={setPassword}
+          editable={!loading}
         />
 
         <TextInput
@@ -64,6 +92,7 @@ export default function Registro({ navigation }) {
           value={telefono}
           onChangeText={setTelefono}
           keyboardType="phone-pad"
+          editable={!loading}
         />
 
         <TextInput
@@ -71,6 +100,7 @@ export default function Registro({ navigation }) {
           placeholder="Nacionalidad"
           value={nacionalidad}
           onChangeText={setNacionalidad}
+          editable={!loading}
         />
 
         <TextInput
@@ -78,10 +108,19 @@ export default function Registro({ navigation }) {
           placeholder=" Fecha de registro (YYYY-MM-DD)"
           value={fechaRegistro}
           onChangeText={setFechaRegistro}
+          editable={!loading}
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Rol (usuario, paciente, medico, administrador)"
+          value={rol}
+          onChangeText={setRol}
+          editable={!loading}
         />
 
         {/* Botones */}
-        <BottonComponent title="Registrarse" />
+        <BottonComponent title={loading ? "Registrando..." : "Registrarse"} onPress={handleRegistro} />
 
         <BottonComponent
           title="¿Ya tienes cuenta? Inicia Sesión"
@@ -104,11 +143,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
-  },
-  image: {
-    width: 130,
-    height: 130,
-    marginBottom: 15,
   },
   title: {
     fontSize: 30,

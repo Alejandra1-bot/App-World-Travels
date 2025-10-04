@@ -1,17 +1,21 @@
-import{ StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import{ StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 
-export default function CardComponents({tittle, description, icon}) {
+export default function CardComponents({tittle, description, icon, image, onPress}) {
     return(
-        <TouchableOpacity style={styles.card}> //TouchableOpacity es un boton con un efecto 
-            <View style={styles.iconContainer}>
-                <Ionicons name={icon} size={32} color="#ffffff" />
+        <TouchableOpacity style={styles.card} onPress={onPress}> //TouchableOpacity es un boton con un efecto
+            {image ? (
+                <Image source={{ uri: image }} style={styles.image} />
+            ) : (
+                <View style={styles.iconContainer}>
+                    <Ionicons name={icon} size={32} color="#ffffff" />
                 </View>
+            )}
 
-                <View>
+                <View style={styles.textContainer}>
                 <Text style={styles.tittle}>{tittle}</Text>
-                <Text style={styles.description}>{description}</Text>   
+                <Text style={styles.description}>{description}</Text>
             </View>
         </TouchableOpacity>
     )
@@ -34,7 +38,7 @@ const styles = StyleSheet.create({
 
     iconContainer: {
         width: 64,
-        height: 64, 
+        height: 64,
         borderRadius: 32,
         backgroundColor: '#4a90e2',
         justifyContent: 'center',
@@ -42,8 +46,15 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
 
+    image: {
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        marginBottom: 12,
+    },
+
     textContainer: {
-        felex: 1,
+        flex: 1,
         alignItems: 'center',
     },
 
