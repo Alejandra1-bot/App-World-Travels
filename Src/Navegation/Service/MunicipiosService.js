@@ -1,46 +1,56 @@
-// Servicio simulado para Municipios
-const municipios = [
-  {
-    id: 1,
-    nombre: 'Villa de Leyva',
-    departamento: 'Boyacá',
-    descripcion: 'Pueblo colonial con arquitectura histórica.',
-    poblacion: 12000,
-    imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-  },
-  {
-    id: 2,
-    nombre: 'Raquira',
-    departamento: 'Boyacá',
-    descripcion: 'Conocido por sus artesanías en barro.',
-    poblacion: 8000,
-    imagen: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-  },
-];
+import api from "./Conexion";
 
-export const getMunicipios = () => municipios;
+export const listarMunicipios= async () => {
+    try {
+    const response = await api.get("/listarMunicipios");
+    return {success: true, data: response.data};
 
-export const getMunicipioById = (id) => municipios.find(m => m.id === id);
+    } catch (error) {
+        console.error("Error al listar los Municipios:", error.response ? error.response.data : error.message);
+        return {
+            success: false,
+            message: error.response ? error.response.data : "Error de conexion ",
+        };
+    }  
+}
+ 
+export const eliminarMunicipios = async (id) => {
+    try {
+        await api.delete(`/eliminarMunicipios/${id}`);
+        return {success: true };
+    } catch (error) {
+        console.error("Error al eliminar el  Municipio:", error.response ? error.response.data : error.message);
+        return {
+        success: false, 
+        message: error.response ? error.response.data : "Error de conexion ",
+        };
+    }
+}
 
-export const createMunicipio = (data) => {
-  const newMunicipio = { id: municipios.length + 1, ...data };
-  municipios.push(newMunicipio);
-  return newMunicipio;
+export const crearMunicipios = async (data) => {
+    try {
+        const response = await api.post("/crearMunicipios", data );
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.error("Error al crear el Municipio:", error.response ? error.response.data : error.message);
+        return {
+            success: false,
+            message: error.response ? error.response.data : "Error de conexion ",
+        };
+    }
+};
+export const actualizarMunicipios = async (id, data) => {
+    try {
+        const response = await api.put(`/actualizarMunicipios/${id}`, data);
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.error("Error al editar el Municipio:", error.response ? error.response.data : error.message);
+        return {
+            success: false,
+            message: error.response ? error.response.data : "Error de conexion ",
+        };
+    }
 };
 
-export const updateMunicipio = (id, data) => {
-  const index = municipios.findIndex(m => m.id === id);
-  if (index !== -1) {
-    municipios[index] = { ...municipios[index], ...data };
-    return municipios[index];
-  }
-  return null;
-};
 
-export const deleteMunicipio = (id) => {
-  const index = municipios.findIndex(m => m.id === id);
-  if (index !== -1) {
-    return municipios.splice(index, 1)[0];
-  }
-  return null;
-};
+

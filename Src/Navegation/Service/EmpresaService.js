@@ -1,12 +1,12 @@
 import api from "./Conexion";
 
-export const listarComentarios= async () => {
+export const listarPacientes= async () => {
     try {
-    const response = await api.get("/listarComentarios");
+    const response = await api.get("/listarPacientes");
     return {success: true, data: response.data};
 
     } catch (error) {
-        console.error("Error al listar los Comentarios:", error.response ? error.response.data : error.message);
+        console.error("Error al listar pacientes:", error.response ? error.response.data : error.message);
         return {
             success: false,
             message: error.response ? error.response.data : "Error de conexion ",
@@ -14,12 +14,12 @@ export const listarComentarios= async () => {
     }  
 }
  
-export const eliminarComentarios = async (id) => {
+export const eliminarPaciente = async (id) => {
     try {
-        await api.delete(`/eliminarComentarios/${id}`);
+        await api.delete(`/eliminarPacientes/${id}`);
         return {success: true };
     } catch (error) {
-        console.error("Error al eliminar el  Comentario:", error.response ? error.response.data : error.message);
+        console.error("Error al eliminar el  pacientes:", error.response ? error.response.data : error.message);
         return {
         success: false, 
         message: error.response ? error.response.data : "Error de conexion ",
@@ -27,24 +27,24 @@ export const eliminarComentarios = async (id) => {
     }
 }
 
-export const crearComentarios = async (data) => {
+export const crearPaciente = async (data) => {
     try {
-        const response = await api.post("/crearComentarios", data );
+        const response = await api.post("/CrearPacientes", data );
         return { success: true, data: response.data };
     } catch (error) {
-        console.error("Error al crear el Comentario:", error.response ? error.response.data : error.message);
+        // console.error("Error al crear el paciente:", error.response ? error.response.data : error.message);
         return {
             success: false,
             message: error.response ? error.response.data : "Error de conexion ",
         };
     }
 };
-export const actualizarComentarios = async (id, data) => {
+export const editarPaciente = async (id, data) => {
     try {
-        const response = await api.put(`/actualizarComentarios/${id}`, data);
+        const response = await api.put(`/actualizarPacientes/${id}`, data);
         return { success: true, data: response.data };
     } catch (error) {
-        console.error("Error al editar el Comentario:", error.response ? error.response.data : error.message);
+        // console.error("Error al editar el paciente:", error.response ? error.response.data : error.message);
         return {
             success: false,
             message: error.response ? error.response.data : "Error de conexion ",

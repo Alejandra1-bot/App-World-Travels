@@ -1,46 +1,56 @@
-// Servicio simulado para Departamentos
-const departamentos = [
-  {
-    id: 1,
-    nombre: 'Boyacá',
-    descripcion: 'Departamento con rica historia y naturaleza.',
-    poblacion: 1210000,
-    capital: 'Tunja',
-    imagen: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-  },
-  {
-    id: 2,
-    nombre: 'Cundinamarca',
-    descripcion: 'Centro del país con Bogotá como capital.',
-    poblacion: 3000000,
-    capital: 'Bogotá',
-    imagen: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-  },
-];
+import api from "./Conexion";
 
-export const getDepartamentos = () => departamentos;
+export const listarDepartamentos= async () => {
+    try {
+    const response = await api.get("/listarDepartamentos");
+    return {success: true, data: response.data};
 
-export const getDepartamentoById = (id) => departamentos.find(d => d.id === id);
+    } catch (error) {
+        console.error("Error al listar los  Departamentos:", error.response ? error.response.data : error.message);
+        return {
+            success: false,
+            message: error.response ? error.response.data : "Error de conexion ",
+        };
+    }  
+}
+ 
+export const eliminarDepartamentos = async (id) => {
+    try {
+        await api.delete(`/eliminarDepartamentos/${id}`);
+        return {success: true };
+    } catch (error) {
+        console.error("Error al eliminar el  Departamento:", error.response ? error.response.data : error.message);
+        return {
+        success: false, 
+        message: error.response ? error.response.data : "Error de conexion ",
+        };
+    }
+}
 
-export const createDepartamento = (data) => {
-  const newDepartamento = { id: departamentos.length + 1, ...data };
-  departamentos.push(newDepartamento);
-  return newDepartamento;
+export const crearDepartamentos = async (data) => {
+    try {
+        const response = await api.post("/crearDepartamentos", data );
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.error("Error al crear el Departamento:", error.response ? error.response.data : error.message);
+        return {
+            success: false,
+            message: error.response ? error.response.data : "Error de conexion ",
+        };
+    }
+};
+export const actualizarDepartamentos = async (id, data) => {
+    try {
+        const response = await api.put(`/actualizarDepartamentos/${id}`, data);
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.error("Error al editar el Departamento:", error.response ? error.response.data : error.message);
+        return {
+            success: false,
+            message: error.response ? error.response.data : "Error de conexion ",
+        };
+    }
 };
 
-export const updateDepartamento = (id, data) => {
-  const index = departamentos.findIndex(d => d.id === id);
-  if (index !== -1) {
-    departamentos[index] = { ...departamentos[index], ...data };
-    return departamentos[index];
-  }
-  return null;
-};
 
-export const deleteDepartamento = (id) => {
-  const index = departamentos.findIndex(d => d.id === id);
-  if (index !== -1) {
-    return departamentos.splice(index, 1)[0];
-  }
-  return null;
-};
+

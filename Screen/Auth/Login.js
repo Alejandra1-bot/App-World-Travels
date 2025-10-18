@@ -1,68 +1,135 @@
-import { TextInput, Text, View, StyleSheet } from "react-native";
+import {
+  TextInput,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  useColorScheme
+} from "react-native";
 import BottonComponent from "../../Components/BottonComponents";
 import { useState } from "react";
-import { loginUser } from "../../Src/Navegation/Service/AuthService";
+import { loginUser } from "../../Src/Services/AuthService";
+import { useAppContext } from "../Configuracion/AppContext";
 
 export default function Login({ navigation }) {
-  const [email, setEmail] = useState("");
+  const [Email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { login } = useAppContext();
+
+  const theme = useColorScheme(); // "light" | "dark"
+
+  const colors = theme === "dark"
+    ? {
+        background: "#0F172A",
+        card: "#1E293B",
+        text: "#F1F5F9",
+        subtext: "#94A3B8",
+        border: "#334155",
+        inputBg: "#1E293B",
+      }
+    : {
+        background: "#E0F2FE",
+        card: "#fff",
+        text: "#0F172A",
+        subtext: "#64748B",
+        border: "#CBD5E1",
+        inputBg: "#F8FAFC",
+      };
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      alert('Por favor, ingresa email y contraseña.');
-      return;
-    }
     setLoading(true);
-    const result = await loginUser(email, password);
-    setLoading(false);
-    if (result.success) {
-      alert('Login exitoso.');
-      navigation.navigate('Main');
-    } else {
-      alert('Error en login: ' + result.message);
+    try {
+      const result = await loginUser(Email, password);
+      if (result.success) {
+        const token = result.token;
+        const role = result.role || 'usuario'; // default if not provided
+        const userId = result.userId;
+        await login(token, role, userId);
+        Alert.alert("Éxito", "Inicio de sesión exitoso");
+      } else {
+        Alert.alert(
+          "Error de Login",
+          typeof result.message === "string"
+            ? result.message
+            : result.message?.message || JSON.stringify(result.message) || "Ocurrió un error al iniciar sesión"
+        );
+      }
+    } catch (error) {
+      console.error("Error inesperado en login:", error);
+      Alert.alert("Error", "Ocurrió un error inesperado al intentar iniciar sesión");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.titulo}> World Travels</Text>
-      <Text style={styles.subtitulo}>
-        Tu compañero de confianza para planear y disfrutar tus viajes 
-      </Text>
-     <Text style={styles.subtitulo}>Inicia sesión para continuar.</Text>
+    <KeyboardAvoidingView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
+    >
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
+        {/* Logo */}
+        <Image
+          source={{ uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" }}
+          style={styles.logo}
+        />
 
-      <View style={styles.form}>
+        {/* Título */}
+        <Text style={[styles.titulo, { color: colors.text }]}>🏥 World Travels</Text>
+        <Text style={[styles.subtitulo, { color: colors.subtext }]}>
+          Accede a tu cuenta para continuar
+        </Text>
+
+        {/* Inputs */}
         <TextInput
-          style={styles.input}
-          placeholder="✉️ Correo Electrónico"
-          value={email}
+          style={[
+            styles.input,
+            { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text },
+          ]}
+          placeholder="📧 Correo electrónico"
+          placeholderTextColor={colors.subtext}
+          value={Email}
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
-          editable={!loading}
         />
 
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text },
+          ]}
           placeholder="🔒 Contraseña"
+          placeholderTextColor={colors.subtext}
+          secureTextEntry
           value={password}
           onChangeText={setPassword}
-          secureTextEntry={true}
           editable={!loading}
         />
 
-        <BottonComponent title={loading ? "Iniciando..." : "Iniciar Sesión"} onPress={handleLogin} />
+              <BottonComponent 
+          title="✅ Iniciar Sesión"  
+          onPress={handleLogin} 
+          disabled={loading}
+          gradient // este activa el gradiente
+        />
 
         <BottonComponent
-          title="¿No tienes una cuenta? Regístrate"
+          title="¿No tienes cuenta? Regístrate"
           onPress={() => navigation.navigate("Registro")}
-          style={{ backgroundColor: "#0A2647" }}
+          style={{ backgroundColor: "#0A2647", paddingVertical: 14, paddingHorizontal: 20, borderRadius: 25 }}
         />
+
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

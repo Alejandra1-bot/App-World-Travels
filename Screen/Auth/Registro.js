@@ -1,136 +1,186 @@
 import { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView } from 'react-native';
+import { loginUser, registerUser } from '../../Src/Services/AuthService';
+import { View, Text, TextInput, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import BottonComponent from '../../Components/BottonComponents';
-import { registerUser } from '../../Src/Navegation/Service/AuthService';
 
 export default function Registro({ navigation }) {
-  const [nombre, setNombre] = useState('');
-  const [apellido, setApellido] = useState('');
-  const [email, setEmail] = useState('');
-  const [telefono, setTelefono] = useState('');
+  const [Nombre, setName] = useState('');
+  const [Apellido, setApellido] = useState('');
+  const [Email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [nacionalidad, setNacionalidad] = useState('');
-  const [fechaRegistro, setFechaRegistro] = useState('');
-  const [rol, setRol] = useState('usuario');
+  const [Telefono, setTelefono] = useState('');
+  const [Nacionalidad, setNacionalidad] = useState('');
+  const [Fecha_Registro, setFecha_Registro] = useState('');
+ 
+  const [roles, setRol] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleRegistro = async () => {
-    if (!nombre || !apellido || !email || !password) {
-      alert('Por favor, completa todos los campos obligatorios.');
-      return;
-    }
-    setLoading(true);
-    const userData = {
-      nombre,
-      apellido,
-      email,
-      telefono,
-      password,
-      nacionalidad,
-      fechaRegistro,
-      roles: rol
-    };
-    const result = await registerUser(userData);
-    setLoading(false);
-    if (result.success) {
-      alert('Registro exitoso. Ahora puedes iniciar sesión.');
-      navigation.navigate('Login');
-    } else {
-      alert('Error en el registro: ' + result.message);
-    }
+const handleRegister = async () => {
+  // Validación de contraseña
+  if (password.length < 8) {
+    Alert.alert("Error", "La contraseña debe tener al menos 8 caracteres.");
+    return;
+  }
+
+  // Validación de email
+  if (!Email.endsWith('@gmail.com')) {
+    Alert.alert("Error", "El correo electrónico debe terminar con @gmail.com.");
+    return;
+  }
+
+  const requiredFields = roles === 'Empresa'
+    ? [Nombre, Apellido, Documento, Telefono, Email, password, roles] // flata por completar en el laravel y en base de datos 
+    : [Nombre, Apellido, Documento, Telefono, Email, Fecha_Registro,  , Nacionalidad, password, roles];
+
+  if (requiredFields.some(field => !field)) {
+    Alert.alert("Error", "Por favor, completa todos los campos requeridos, incluyendo el rol.");
+    return;
+  }
+  if (roles === 'medico' && (!idConsultorio || !idEspecialidad)) {
+    Alert.alert("Error", "Para médicos, completa ID Consultorio e ID Especialidad.");  // falta por modificar 
+    return;
+  }
+  setLoading(true);
+  const userData = {
+    Nombre,
+    Apellido,
+    Documento,
+    Telefono,
+    Email,
+    ...((roles !== 'Empresa') && {
+      Fecha_nacimiento,
+      Genero,
+      RH,
+      Nacionalidad, // falta por modificar 
+    }),
+    password,
+    roles,
+    ...(roles === 'medico' && { idConsultorio, idEspecialidad }),
+    ...(roles === 'recepcionista' && { Turno }),  // falta por modificar 
   };
 
-  return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        
+  try {
+    const result = await registerUser(userData);
+    if (result.success) {
+      Alert.alert("Registro Exitoso", "Tu cuenta ha sido creada correctamente.", [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("Login"),
+        },
+      ]);
+    } else {
+      let errorMessage =typeof result.message === "string"? result.message : result.message?.message || JSON.stringify(result.message);
+      Alert.alert("Error", errorMessage || "Ocurrió un error en el registro");
+    }
+  } catch (error) {
+    Alert.alert("Error", "Error inesperado en el registro");
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
-        <Text style={styles.title}>Regístrate</Text>
+  return (
+    <KeyboardAvoidingView  //Contenedor que ajusta su comportamiento cuando aparece el teclado.
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.innerContainer}>
+        <Text style={styles.title}>🌍 Crear cuenta</Text>
         <Text style={styles.subtitle}>
-          Únete a <Text style={styles.appName}>World Travels</Text> y empieza a planear tus aventuras.
+          Regístrate en <Text style={styles.appName}>WORLD TRAVELS</Text> Distruta viajar con nosotros seguros y vvir una experiencia involvidable.
         </Text>
 
-        {/* Inputs */}
+       
         <TextInput
           style={styles.input}
-          placeholder="Nombre"
-          value={nombre}
-          onChangeText={setNombre}
-          editable={!loading}
+          placeholder=" Nombre"
+          value={Nombre}
+          onChangeText={setName}
         />
 
         <TextInput
           style={styles.input}
           placeholder="Apellido"
-          value={apellido}
+          value={Apellido}
           onChangeText={setApellido}
-          editable={!loading}
+        />
+
+      
+        <TextInput
+          style={styles.input}
+          placeholder="Teléfono"
+          value={Telefono}
+          onChangeText={setTelefono}
+          keyboardType="phone-pad"
         />
 
         <TextInput
           style={styles.input}
           placeholder="Correo electrónico"
-          value={email}
+          value={Email}
           onChangeText={setEmail}
-          keyboardType="email-address"
           autoCapitalize="none"
-          editable={!loading}
         />
+        <TextInput
+              style={styles.input}
+              placeholder="Nacionalidad"
+              value={Nacionalidad}
+              onChangeText={setNacionalidad}
+            />
+
+
 
         <TextInput
           style={styles.input}
-          placeholder="Contraseña"
+          placeholder=" Contraseña"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
           editable={!loading}
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Teléfono"
-          value={telefono}
-          onChangeText={setTelefono}
-          keyboardType="phone-pad"
-          editable={!loading}
-        />
+        {roles === 'recepcionista' && (
+          <TextInput
+            style={styles.input}
+            placeholder="Turno"
+            value={Turno}
+            onChangeText={setTurno}
+          />
+        )}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Nacionalidad"
-          value={nacionalidad}
-          onChangeText={setNacionalidad}
-          editable={!loading}
-        />
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={roles}
+            onValueChange={(itemValue) => setRol(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Selecciona un rol" value="" />
+            <Picker.Item label="Usuario" value="Usuario" />
+            <Picker.Item label="Empresa" value="Empresa" />
+            
+          </Picker>
+        </View>
 
-        <TextInput
-          style={styles.input}
-          placeholder=" Fecha de registro (YYYY-MM-DD)"
-          value={fechaRegistro}
-          onChangeText={setFechaRegistro}
-          editable={!loading}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Rol (usuario, paciente, medico, administrador)"
-          value={rol}
-          onChangeText={setRol}
-          editable={!loading}
-        />
-
+       
         {/* Botones */}
-        <BottonComponent title={loading ? "Registrando..." : "Registrarse"} onPress={handleRegistro} />
+        <BottonComponent title="Registrarse"  onPress={handleRegister} disabled={loading} />
 
         <BottonComponent
           title="¿Ya tienes cuenta? Inicia Sesión"
           onPress={() => navigation.navigate('Login')}
           style={{ backgroundColor: '#0A2647' }}
         />
-      </View>
-    </ScrollView>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   scrollContainer: {
