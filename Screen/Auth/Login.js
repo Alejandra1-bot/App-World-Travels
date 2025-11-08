@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import BottonComponent from "../../Components/BottonComponents";
 import { useState } from "react";
-import { loginUser } from "../../Src/Services/AuthService";
-import { useAppContext } from "../Configuracion/AppContext";
+import { loginUser } from "../../Src/Navegation/Service/AuthService";
+import { useAppContext } from "../../Screen/Configuracion/AppContext";
 
 export default function Login({ navigation }) {
   const [Email, setEmail] = useState("");

@@ -21,7 +21,7 @@ export default function UsuariosStack() {
       <Stack.Screen
         name="editarUsuario"
         component={editarUsuario}
-        options={{ title: 'Editar Usuario' }}
+        options={{ title: 'Gestion De Usuarios' }}
       />
     </Stack.Navigator>
   );

@@ -1,21 +1,26 @@
-import { useState } from 'react';
-import { loginUser, registerUser } from '../../Src/Services/AuthService';
+import { useState, useEffect } from 'react';
+import { loginUser, registerUser } from '../../Src/Navegation/Service/AuthService';
 import { View, Text, TextInput, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+// import { Picker } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+
 import BottonComponent from '../../Components/BottonComponents';
 
 export default function Registro({ navigation }) {
   const [Nombre, setName] = useState('');
   const [Apellido, setApellido] = useState('');
-  const [Email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [Telefono, setTelefono] = useState('');
+  const [Email, setEmail] = useState('');
   const [Nacionalidad, setNacionalidad] = useState('');
-  const [Fecha_Registro, setFecha_Registro] = useState('');
- 
-  const [roles, setRol] = useState('');
+  const [password, setPassword] = useState('');
+  const [roles, setRol] = useState('usuario');
+  const [NombreEmpresa, setNombreEmpresa] = useState('');
+  const [DireccionEmpresa, setDireccionEmpresa] = useState('');
+  const [TelefonoEmpresa, setTelefonoEmpresa] = useState('');
   const [loading, setLoading] = useState(false);
+  const [accessCode, setAccessCode] = useState('');
 
+  // No se necesitan datos adicionales para este formulario
 const handleRegister = async () => {
   // Validación de contraseña
   if (password.length < 8) {
@@ -29,35 +34,51 @@ const handleRegister = async () => {
     return;
   }
 
-  const requiredFields = roles === 'Empresa'
-    ? [Nombre, Apellido, Documento, Telefono, Email, password, roles] // flata por completar en el laravel y en base de datos 
-    : [Nombre, Apellido, Documento, Telefono, Email, Fecha_Registro,  , Nacionalidad, password, roles];
+  // Validación de códigos de acceso para roles restringidos
+  const validCodes = {
+    administrador: 'ADMIN2025',
+    empresa: 'EMPRESA2025'
+  };
+
+  if (roles === 'administrador' || roles === 'empresa') {
+    if (!accessCode) {
+      Alert.alert("Error", `Se requiere un código de acceso único para el rol de ${roles === 'administrador' ? 'Administrador' : 'Empresa'}.`);
+      return;
+    }
+    if (accessCode !== validCodes[roles]) {
+      Alert.alert("Error", `Código de acceso incorrecto para el rol de ${roles === 'administrador' ? 'Administrador' : 'Empresa'}.`);
+      return;
+    }
+  }
+
+  const requiredFields = roles === 'administrador'
+    ? [Nombre, Apellido, Telefono, Email, password, roles]
+    : roles === 'empresa'
+    ? [NombreEmpresa, DireccionEmpresa, TelefonoEmpresa, Email, password, roles]
+    : [Nombre, Apellido, Telefono, Email, Nacionalidad, password, roles];
 
   if (requiredFields.some(field => !field)) {
     Alert.alert("Error", "Por favor, completa todos los campos requeridos, incluyendo el rol.");
     return;
   }
-  if (roles === 'medico' && (!idConsultorio || !idEspecialidad)) {
-    Alert.alert("Error", "Para médicos, completa ID Consultorio e ID Especialidad.");  // falta por modificar 
-    return;
-  }
   setLoading(true);
   const userData = {
-    Nombre,
-    Apellido,
-    Documento,
-    Telefono,
-    Email,
-    ...((roles !== 'Empresa') && {
-      Fecha_nacimiento,
-      Genero,
-      RH,
-      Nacionalidad, // falta por modificar 
+    ...(roles === 'empresa' ? {
+      NombreEmpresa,
+      DireccionEmpresa,
+      TelefonoEmpresa,
+      Email,
+      password,
+      roles,
+    } : {
+      Nombre,
+      Apellido,
+      Telefono,
+      Email,
+      Nacionalidad,
+      password,
+      roles,
     }),
-    password,
-    roles,
-    ...(roles === 'medico' && { idConsultorio, idEspecialidad }),
-    ...(roles === 'recepcionista' && { Turno }),  // falta por modificar 
   };
 
   try {
@@ -89,9 +110,9 @@ const handleRegister = async () => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.innerContainer}>
-        <Text style={styles.title}>🌍 Crear cuenta</Text>
+        <Text style={styles.title}>✈️ Crear cuenta</Text>
         <Text style={styles.subtitle}>
-          Regístrate en <Text style={styles.appName}>WORLD TRAVELS</Text> Distruta viajar con nosotros seguros y vvir una experiencia involvidable.
+          Regístrate en <Text style={styles.appName}>WorldTravels</Text> y descubre el mundo de los viajes 🗺️.
         </Text>
 
        
@@ -109,7 +130,7 @@ const handleRegister = async () => {
           onChangeText={setApellido}
         />
 
-      
+
         <TextInput
           style={styles.input}
           placeholder="Teléfono"
@@ -123,16 +144,44 @@ const handleRegister = async () => {
           placeholder="Correo electrónico"
           value={Email}
           onChangeText={setEmail}
+
           autoCapitalize="none"
         />
-        <TextInput
+
+        {roles === 'usuario' && (
+          <TextInput
+            style={styles.input}
+            placeholder="Nacionalidad"
+            value={Nacionalidad}
+            onChangeText={setNacionalidad}
+          />
+        )}
+
+        {roles === 'empresa' && (
+          <>
+            <TextInput
               style={styles.input}
-              placeholder="Nacionalidad"
-              value={Nacionalidad}
-              onChangeText={setNacionalidad}
+              placeholder="Nombre de la Empresa"
+              value={NombreEmpresa}
+              onChangeText={setNombreEmpresa}
             />
 
+            <TextInput
+              style={styles.input}
+              placeholder="Dirección de la Empresa"
+              value={DireccionEmpresa}
+              onChangeText={setDireccionEmpresa}
+            />
 
+            <TextInput
+              style={styles.input}
+              placeholder="Teléfono de la Empresa"
+              value={TelefonoEmpresa}
+              onChangeText={setTelefonoEmpresa}
+              keyboardType="phone-pad"
+            />
+          </>
+        )}
 
         <TextInput
           style={styles.input}
@@ -143,14 +192,6 @@ const handleRegister = async () => {
           editable={!loading}
         />
 
-        {roles === 'recepcionista' && (
-          <TextInput
-            style={styles.input}
-            placeholder="Turno"
-            value={Turno}
-            onChangeText={setTurno}
-          />
-        )}
 
         <View style={styles.pickerContainer}>
           <Picker
@@ -158,14 +199,23 @@ const handleRegister = async () => {
             onValueChange={(itemValue) => setRol(itemValue)}
             style={styles.picker}
           >
-            <Picker.Item label="Selecciona un rol" value="" />
-            <Picker.Item label="Usuario" value="Usuario" />
-            <Picker.Item label="Empresa" value="Empresa" />
-            
+            <Picker.Item label="Usuario" value="usuario" />
+            <Picker.Item label="Empresa" value="empresa" />
+            <Picker.Item label="Administrador" value="administrador" />
           </Picker>
         </View>
 
-       
+        {(roles === 'administrador' || roles === 'empresa') && (
+          <TextInput
+            style={styles.input}
+            placeholder="Código de acceso"
+            secureTextEntry
+            value={accessCode}
+            onChangeText={setAccessCode}
+          />
+        )}
+
+
         {/* Botones */}
         <BottonComponent title="Registrarse"  onPress={handleRegister} disabled={loading} />
 
@@ -180,22 +230,28 @@ const handleRegister = async () => {
   );
 }
 
-
-
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#EAF6FF',
+  },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#EAF6FF', // Fondo como en Login
     alignItems: 'center',
-    justifyContent: 'center',
     padding: 20,
   },
+  innerContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  image: {
+    width: 140,
+    height: 140,
+    marginBottom: 15,
+  },
   title: {
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 6,
     color: '#003366',
@@ -226,5 +282,22 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 2,
+  },
+  pickerContainer: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#cfd9e6',
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  picker: {
+    width: '100%',
+    height: 50,
   },
 });

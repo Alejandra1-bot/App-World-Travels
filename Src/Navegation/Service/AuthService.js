@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "./Conexion";
 import { crearUsuarios } from "./UsuariosService";
-import { crearEmpresa } from "./RecepcionistaService";
+import { crearEmpresa } from "./EmpresaService";
 
 export const loginUser= async(Email, password) => {
     try {
@@ -43,7 +43,7 @@ export const registerUser = async (userData) => {
       } else {
         response = regResult;
       }
-    } else if (roles === 'Empresa') {
+    } else if (roles === 'empresa') {
       const regResult = await api.post('/registrar', userData);
       if (regResult.success) {
         const userId = regResult.data.id;
@@ -51,7 +51,10 @@ export const registerUser = async (userData) => {
       } else {
         response = regResult;
       }
-   
+
+    } else if (roles === 'administrador') {
+      // Para administrador, solo registrar en la tabla de usuarios base
+      response = await api.post('/registrar', userData);
     } else {
       throw new Error("Rol no válido");
     }

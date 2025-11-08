@@ -2,7 +2,7 @@ import api from "./Conexion";
 
 export const listarActividades= async () => {
     try {
-    const response = await api.get("/listarActividades");
+    const response = await api.get("/actividades");
     return {success: true, data: response.data};
 
     } catch (error) {
@@ -11,7 +11,7 @@ export const listarActividades= async () => {
             success: false,
             message: error.response ? error.response.data : "Error de conexion ",
         };
-    }  
+    }
 }
  
 export const eliminarActividades = async (id) => {

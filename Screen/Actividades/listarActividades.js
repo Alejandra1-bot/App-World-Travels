@@ -1,98 +1,148 @@
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
-import { useState, useEffect } from "react";
-import { getActividades } from "../../Src/Navegation/Service/ActividadService";
+import { 
+  View, 
+  Text, 
+  FlatList, 
+  ActivityIndicator, 
+  Alert, 
+  TouchableOpacity, 
+  StyleSheet 
+} from "react-native";
+import { listarActividades, eliminarActividad } from "../../Src/Navegation/Service/ActividadService";
+import { listarCategorias } from "../../Src/Navegation/Service/CategoriasService";
+import { useNavigation } from "@react-navigation/native";
+import ActividadCard from "../../Components/ActividadCard";
+import { useEffect, useState } from "react";
+import { useAppContext } from "../../Screen/Configuracion/AppContext";
 
-export default function ListarActividad ({ navigation }){
-    const [actividades, setActividades] = useState([]);
+export default function ListarActividades() {
+  const { colors, texts, userRole } = useAppContext();
 
-    useEffect(() => {
-        setActividades(getActividades());
-    }, []);
+  const [actividades, setActividades] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
-    const renderItem = ({ item }) => (
-        <TouchableOpacity
-            style={styles.item}
-            onPress={() => navigation.navigate('detalleActividad', { actividad: item })}
-        >
-            <View style={styles.textContainer}>
-                <Text style={styles.title}>{item.nombre}</Text>
-                <Text style={styles.description}>{item.descripcion}</Text>
-                <Text style={styles.price}>Precio: ${item.precio}</Text>
-            </View>
+  const handleActividades = async () => {
+    setLoading(true);
+    try {
+      const [actividadesResult, categoriasResult] = await Promise.all([
+        listarActividades(),
+        listarCategorias()
+      ]);
+
+      if (actividadesResult.success) {
+        setActividades(actividadesResult.data);
+        if (categoriasResult.success) setCategorias(categoriasResult.data);
+      } else {
+        Alert.alert("Error", JSON.stringify(actividadesResult.message));
+      }
+    } catch (error) {
+      Alert.alert("Error", "No se pudieron cargar las actividades");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", handleActividades);
+    return unsubscribe;
+  }, [navigation]);
+
+  const handleEditar = (actividad) => {
+    navigation.navigate("EditarActividad", { actividad });
+  };
+
+  const handleCrear = () => {
+    navigation.navigate("EditarActividad");
+  };
+
+  const handleEliminar = (id) => {
+    Alert.alert(
+      "Confirmar Eliminación",
+      "¿Estás seguro de eliminar esta actividad?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await eliminarActividad(id);
+              if (result.success) {
+                handleActividades();
+              } else {
+                Alert.alert("Error", result.message || "No se pudo eliminar la actividad");
+              }
+            } catch (error) {
+              Alert.alert("Error", "No se pudo eliminar la actividad");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <FlatList
+        data={actividades}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <ActividadCard
+            actividad={item}
+            onEdit={() => handleEditar(item)}
+            onDelete={() => handleEliminar(item.id)}
+            userRole={userRole}
+            onPress={() => navigation.navigate("DetalleActividad", {
+              actividad: item,
+              categorias: categorias,
+            })}
+          />
+        )}
+        ListEmptyComponent={
+          <Text style={styles.empty}>No hay Actividades Registradas.</Text>
+        }
+      />
+
+      {(userRole === 'administrador' || userRole === 'empresa') && (
+        <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
+          <Text style={styles.textBotton}>+Nueva Actividad</Text>
         </TouchableOpacity>
-    );
-
-    return(
-        <View style={styles.container}>
-            <Text style={styles.header}>Actividades Disponibles</Text>
-            <FlatList
-                data={actividades}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
-            />
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('editarActividad', { actividad: null })}
-            >
-                <Text style={styles.addButtonText}>Agregar Actividad</Text>
-            </TouchableOpacity>
-        </View>
-    );
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#EAF6FF',
-    },
-    header: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 20,
-        color: '#003366',
-    },
-    item: {
-        backgroundColor: '#FFFFFF',
-        padding: 20,
-        marginBottom: 10,
-        borderRadius: 15,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    textContainer: {
-        alignItems: 'center',
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#003366',
-        marginBottom: 5,
-    },
-    description: {
-        fontSize: 14,
-        color: '#555',
-        marginBottom: 5,
-    },
-    price: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#0A74DA',
-    },
-    addButton: {
-        backgroundColor: '#0A74DA',
-        padding: 15,
-        borderRadius: 10,
-        alignItems: 'center',
-        marginTop: 20,
-    },
-    addButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  empty: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "#555",
+  },
+  botonCrear: {
+    backgroundColor: "#0a18d6ff",
+    padding: 16,
+    borderRadius: 30,
+    margin: 16,
+    alignItems: "center",
+  },
+  textBotton: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
 });
