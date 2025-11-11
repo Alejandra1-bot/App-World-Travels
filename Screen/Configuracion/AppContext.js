@@ -76,6 +76,7 @@ export const AppProvider = ({ children }) => {
       setIsAuthenticated(false);
       setUserRole(null);
       setUserId(null);
+      console.log("Sesión cerrada correctamente");
     } catch (error) {
       console.error('Error during logout:', error);
     }

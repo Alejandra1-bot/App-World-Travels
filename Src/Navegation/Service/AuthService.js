@@ -1,7 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "./Conexion";
-import { crearUsuarios } from "./UsuariosService";
-import { crearEmpresa } from "./EmpresaService";
 
 export const loginUser= async(Email, password) => {
     try {
@@ -32,38 +30,11 @@ export const loginUser= async(Email, password) => {
 
 export const registerUser = async (userData) => {
   try {
-    const { roles, ...data } = userData;
-
-    let response;
-    if (roles === 'usuario') {
-      const regResult = await api.post('/registrar', userData);
-      if (regResult.success) {
-        const userId = regResult.data.id;
-        response = await crearUsuarios({ ...data, idUsuario: userId });
-      } else {
-        response = regResult;
-      }
-    } else if (roles === 'empresa') {
-      const regResult = await api.post('/registrar', userData);
-      if (regResult.success) {
-        const userId = regResult.data.id;
-        response = await crearEmpresa({ ...data, idUsuario: userId });
-      } else {
-        response = regResult;
-      }
-
-    } else if (roles === 'administrador') {
-      // Para administrador, solo registrar en la tabla de usuarios base
-      response = await api.post('/registrar', userData);
-    } else {
-      throw new Error("Rol no válido");
-    }
-
+    const response = await api.post('/registrar', userData);
     console.log("Respuesta del servidor (registro):", response.data);
     return { success: true, data: response.data };
   } catch (error) {
     console.error("Error al registrar usuario:", error.response ? error.response.data : error.message);
-
     return {
       success: false,
       message: error.response ? error.response.data : "Error de conexión",

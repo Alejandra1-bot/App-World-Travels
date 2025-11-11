@@ -1,15 +1,13 @@
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BottonComponent from '../../Components/BottonComponents';
-import { logoutUser } from '../../Src/Navegation/Service/AuthService';
+import { useAppContext } from '../Configuracion/AppContext';
 
 export default function Perfil({ navigation }) {
+  const { logout } = useAppContext();
+
   const handleLogout = async () => {
-    await logoutUser();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Bienvenida' }],
-    });
+    await logout();
   };
 
   return (

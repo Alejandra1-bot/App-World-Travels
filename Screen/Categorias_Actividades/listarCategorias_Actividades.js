@@ -1,116 +1,142 @@
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
-import { useState, useEffect } from "react";
-import { getCategorias } from "../../Src/Navegation/Service/CategoriasService";
+import { 
+  View, 
+  Text, 
+  FlatList, 
+  ActivityIndicator, 
+  Alert, 
+  TouchableOpacity, 
+  StyleSheet 
+} from "react-native";
+import { listarCategorias, eliminarCategorias } from "../../Src/Navegation/Service/CategoriasService";
+import { useNavigation } from "@react-navigation/native";
+import CategoriaActividadCard from "../../Components/CategoriasCard";
+import { useEffect, useState } from "react";
+import { useAppContext } from "../../Screen/Configuracion/AppContext";
 
-export default function ListarCategoriaActividad({ navigation }) {
-    const [categorias, setCategorias] = useState([]);
+export default function ListarCategoria_Actividad() {
+  const { colors, texts, userRole } = useAppContext();
 
-    useEffect(() => {
-        setCategorias(getCategorias());
-    }, []);
+  const [categoriasActividad, setCategoriasActividad] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
-    const renderItem = ({ item }) => (
-        <TouchableOpacity
-            style={styles.item}
-            onPress={() => navigation.navigate('detalleCategoria_Actividad', { categoria: item })}
-        >
-            <View style={styles.info}>
-                <Text style={styles.name}>{item.nombre}</Text>
-                <Text style={styles.description}>{item.descripcion}</Text>
-                <View style={styles.stats}>
-                    <Ionicons name="list" size={16} color="#0A74DA" />
-                    <Text style={styles.statText}>{item.numeroActividades} actividades</Text>
-                </View>
-            </View>
-        </TouchableOpacity>
+  const handleCategoriasActividad = async () => {
+    setLoading(true);
+    try {
+      const result = await listarCategorias();
+      if (result.success) {
+        setCategoriasActividad(result.data);
+      } else {
+        Alert.alert("Error", result.message || "No se pudieron cargar las categorías");
+      }
+    } catch (error) {
+      Alert.alert("Error", "No se pudieron cargar las categorías de actividad");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", handleCategoriasActividad);
+    return unsubscribe;
+  }, [navigation]);
+
+  const handleEditar = (categoria) => {
+    navigation.navigate("EditarCategoria_Actividad", { categoria });
+  };
+
+  const handleCrear = () => {
+    navigation.navigate("EditarCategoria_Actividad");
+  };
+
+  const handleEliminar = (id) => {
+    Alert.alert(
+      "Confirmar Eliminación",
+      "¿Estás seguro de eliminar esta categoría?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await eliminarCategorias(id);
+              if (result.success) {
+                handleCategoriasActividad();
+              } else {
+                Alert.alert("Error", result.message || "No se pudo eliminar la categoría");
+              }
+            } catch (error) {
+              Alert.alert("Error", "No se pudo eliminar la categoría");
+            }
+          },
+        },
+      ]
     );
+  };
 
+  if (loading) {
     return (
-        <View style={styles.container}>
-            <Text style={styles.headerTitle}>Categorías de Actividades</Text>
-            <FlatList
-                data={categorias}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
-            />
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('editarCategoria_Actividad', { categoria: null })}
-            >
-                <Ionicons name="add" size={20} color="#FFFFFF" />
-                <Text style={styles.addButtonText}>Agregar Categoría</Text>
-            </TouchableOpacity>
-        </View>
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
     );
+  }
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <FlatList
+        data={categoriasActividad}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <CategoriaActividadCard
+            categoria={item}
+            onEdit={() => handleEditar(item)}
+            onDelete={() => handleEliminar(item.id)}
+            userRole={userRole}
+            onPress={() =>
+              navigation.navigate("DetalleCategoria_Actividad", {
+                categoria: item,
+              })
+            }
+          />
+        )}
+        ListEmptyComponent={
+          <Text style={styles.empty}>No hay Categorías de Actividad Registradas.</Text>
+        }
+      />
+
+      {(userRole === 'administrador' || userRole === 'empresa') && (
+        <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
+          <Text style={styles.textBotton}>+Nueva Categoría</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#EAF6FF',
-    },
-    headerTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 20,
-        color: '#003366',
-    },
-    item: {
-        backgroundColor: '#FFFFFF',
-        padding: 20,
-        marginBottom: 10,
-        borderRadius: 15,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    info: {
-        alignItems: 'center',
-    },
-    name: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#003366',
-        marginBottom: 5,
-    },
-    description: {
-        fontSize: 14,
-        color: '#555',
-        marginBottom: 5,
-        lineHeight: 20,
-    },
-    stats: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    statText: {
-        fontSize: 12,
-        color: '#555',
-        marginLeft: 5,
-    },
-    addButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#0A74DA',
-        padding: 15,
-        borderRadius: 15,
-        marginTop: 20,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    addButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginLeft: 10,
-    },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  empty: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "#555",
+  },
+  botonCrear: {
+    backgroundColor: "#0a18d6ff",
+    padding: 16,
+    borderRadius: 30,
+    margin: 16,
+    alignItems: "center",
+  },
+  textBotton: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
 });

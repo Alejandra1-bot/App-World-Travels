@@ -13,6 +13,7 @@ import {
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { crearUsuarios, actualizarUsuarios } from "../../Src/Navegation/Service/UsuariosService";
 import { useAppContext } from "../Configuracion/AppContext";
@@ -110,133 +111,174 @@ export default function EditarUsuario() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
-    >
-      <ScrollView>
-        <View style={styles.container}>
-          <Text style={styles.headerTitle}>
-            {esEdicion ? "Editar Usuario" : "Nuevo Usuario"}
-          </Text>
-
-          {/* Formulario */}
-          <TextInput
-            style={styles.input}
-            placeholder="Nombre"
-            value={Nombre}
-            onChangeText={setNombre}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Apellido"
-            value={Apellido}
-            onChangeText={setApellido}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Correo electrónico"
-            value={Email}
-            onChangeText={setCorreo}
-            keyboardType="email-address"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Teléfono"
-            value={Telefono}
-            onChangeText={setTelefono}
-            keyboardType="phone-pad"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Nacionalidad"
-            value={Nacionalidad}
-            onChangeText={setNacionalidad}
-          />
-           <TextInput
-             style={styles.input}
-             placeholder="Fecha de Registro"
-             value={Fecha_Registro}
-             onChangeText={setFechaRegistro}
-             editable={false}
-           />
-
-          {!esEdicion && (
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Crear Nuevo Usuario</Text>
             <TextInput
               style={styles.input}
-              placeholder="Contraseña"
-              value={Contrasena}
-              onChangeText={setContrasena}
-              secureTextEntry
+              placeholder="Nombre"
+              value={Nombre}
+              onChangeText={setNombre}
             />
-           
-          )}
+            <TextInput
+              style={styles.input}
+              placeholder="Apellido"
+              value={Apellido}
+              onChangeText={setApellido}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Correo electrónico"
+              value={Email}
+              onChangeText={setCorreo}
+              keyboardType="email-address"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Teléfono"
+              value={Telefono}
+              onChangeText={setTelefono}
+              keyboardType="phone-pad"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Nacionalidad"
+              value={Nacionalidad}
+              onChangeText={setNacionalidad}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Fecha de Registro"
+              value={Fecha_Registro}
+              onChangeText={setFechaRegistro}
+              editable={false}
+            />
 
-          
+            {!esEdicion && (
+              <TextInput
+                style={styles.input}
+                placeholder="Contraseña"
+                value={Contrasena}
+                onChangeText={setContrasena}
+                secureTextEntry
+              />
+            )}
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleGuardar}
-            disabled={loading}
-          >
-            <Ionicons name="save-outline" size={22} color="#fff" />
-            <Text style={styles.buttonText}>
-              {esEdicion ? "Guardar Cambios" : "Crear Usuario"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={handleGuardar}
+              disabled={loading}
+            >
+              <Ionicons name="save" size={24} color="#fff" />
+              <Text style={styles.saveButtonText}>Guardar Usuario</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F9FAFB" },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#e1f5fe",
+  },
+  header: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#e1f5fe",
+    paddingVertical: 5,
+    paddingHorizontal: 20,
+    paddingTop: 10, // Para notch
+  },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: "bold",
-    color: "#110e0eff",
-    marginTop: 10,
+    color: "#000",
     textAlign: "center",
+    fontFamily: "serif",
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+    transform: [{ translateY: -2 }],
+  },
+  titleContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#e1f5fe",
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "flex-start",
+    paddingVertical: 10,
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 20,
+    paddingTop: 30,
+    marginHorizontal: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 8,
   },
   input: {
-    backgroundColor: "#fff",
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 12,
+    backgroundColor: "#f9f9f9",
+    padding: 10,
+    borderRadius: 15,
+    marginBottom: 10,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#ddd",
+    fontSize: 14,
+    fontFamily: "sans-serif",
   },
-  button: {
+  saveButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#10B981",
-    padding: 15,
-    borderRadius: 500,
+    backgroundColor: "#007bff",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 30,
     justifyContent: "center",
-    marginTop: 2,
-    marginBottom: 20,
+    marginTop: 60,
+    shadowColor: "#007bff",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 6,
+    transform: [{ translateY: -5 }],
+    alignSelf: "center",
   },
-  buttonText: {
+  saveButtonText: {
     color: "#fff",
-    fontSize: 16,
-    marginLeft: 8,
-    fontWeight: "600",
-  },
-  pickerContainer: {
-    marginBottom: 12,
-  },
-  label: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "bold",
-    color: "#374151",
-    marginBottom: 4,
+    marginLeft: 6,
   },
-  picker: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
+  cardTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#007bff",
+    textAlign: "center",
+    marginBottom: 20,
+    fontFamily: "serif",
+    textShadowColor: "rgba(0, 123, 255, 0.5)",
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+    transform: [{ translateY: -2 }],
   },
 });
+

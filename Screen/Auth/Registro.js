@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react';
-import { loginUser, registerUser } from '../../Src/Navegation/Service/AuthService';
-import { View, Text, TextInput, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-// import { Picker } from 'react-native';
+import { useState } from 'react';
+import { registerUser } from '../../Src/Navegation/Service/AuthService';
+import { View, Text, TextInput, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-
 import BottonComponent from '../../Components/BottonComponents';
 
 export default function Registro({ navigation }) {
@@ -15,95 +13,103 @@ export default function Registro({ navigation }) {
   const [password, setPassword] = useState('');
   const [roles, setRol] = useState('usuario');
   const [NombreEmpresa, setNombreEmpresa] = useState('');
+  const [NitEmpresa, setNitEmpresa] = useState('');
   const [DireccionEmpresa, setDireccionEmpresa] = useState('');
-  const [TelefonoEmpresa, setTelefonoEmpresa] = useState('');
+  const [CiudadEmpresa, setCiudadEmpresa] = useState('');
   const [loading, setLoading] = useState(false);
   const [accessCode, setAccessCode] = useState('');
 
-  // No se necesitan datos adicionales para este formulario
-const handleRegister = async () => {
-  // Validación de contraseña
-  if (password.length < 8) {
-    Alert.alert("Error", "La contraseña debe tener al menos 8 caracteres.");
-    return;
-  }
+ const handleRegister = async () => {
+   // Validación de contraseña
+   if (password.length < 8) {
+     Alert.alert("Error", "La contraseña debe tener al menos 8 caracteres.");
+     return;
+   }
 
-  // Validación de email
-  if (!Email.endsWith('@gmail.com')) {
-    Alert.alert("Error", "El correo electrónico debe terminar con @gmail.com.");
-    return;
-  }
+   // Validación de email
+   if (!Email.endsWith('@gmail.com')) {
+     Alert.alert("Error", "El correo electrónico debe terminar con @gmail.com.");
+     return;
+   }
 
-  // Validación de códigos de acceso para roles restringidos
-  const validCodes = {
-    administrador: 'ADMIN2025',
-    empresa: 'EMPRESA2025'
-  };
+   // Validación de códigos de acceso para roles restringidos
+   const validCodes = {
+     administrador: 'ADMIN2025',
+     empresa: 'EMPRESA2025'
+   };
 
-  if (roles === 'administrador' || roles === 'empresa') {
-    if (!accessCode) {
-      Alert.alert("Error", `Se requiere un código de acceso único para el rol de ${roles === 'administrador' ? 'Administrador' : 'Empresa'}.`);
-      return;
-    }
-    if (accessCode !== validCodes[roles]) {
-      Alert.alert("Error", `Código de acceso incorrecto para el rol de ${roles === 'administrador' ? 'Administrador' : 'Empresa'}.`);
-      return;
-    }
-  }
+   if (roles === 'administrador' || roles === 'empresa') {
+     if (!accessCode) {
+       Alert.alert("Error", `Se requiere un código de acceso único para el rol de ${roles === 'administrador' ? 'Administrador' : 'Empresa'}.`);
+       return;
+     }
+     if (accessCode !== validCodes[roles]) {
+       Alert.alert("Error", `Código de acceso incorrecto para el rol de ${roles === 'administrador' ? 'Administrador' : 'Empresa'}.`);
+       return;
+     }
+   }
 
-  const requiredFields = roles === 'administrador'
-    ? [Nombre, Apellido, Telefono, Email, password, roles]
-    : roles === 'empresa'
-    ? [NombreEmpresa, DireccionEmpresa, TelefonoEmpresa, Email, password, roles]
-    : [Nombre, Apellido, Telefono, Email, Nacionalidad, password, roles];
+   const requiredFields = roles === 'administrador'
+     ? [Nombre, Apellido, Telefono, Email, password, roles]
+     : roles === 'empresa'
+     ? [NombreEmpresa, NitEmpresa, DireccionEmpresa, CiudadEmpresa, Email, password, roles]
+     : [Nombre, Apellido, Telefono, Email, Nacionalidad, password, roles];
 
-  if (requiredFields.some(field => !field)) {
-    Alert.alert("Error", "Por favor, completa todos los campos requeridos, incluyendo el rol.");
-    return;
-  }
-  setLoading(true);
-  const userData = {
-    ...(roles === 'empresa' ? {
-      NombreEmpresa,
-      DireccionEmpresa,
-      TelefonoEmpresa,
-      Email,
-      password,
-      roles,
-    } : {
-      Nombre,
-      Apellido,
-      Telefono,
-      Email,
-      Nacionalidad,
-      password,
-      roles,
-    }),
-  };
+   if (requiredFields.some(field => !field)) {
+     Alert.alert("Error", "Por favor, completa todos los campos requeridos, incluyendo el rol.");
+     return;
+   }
+   setLoading(true);
+   const userData = {
+     ...(roles === 'empresa' ? {
+       NombreEmpresa,
+       NitEmpresa,
+       DireccionEmpresa,
+       CiudadEmpresa,
+       Email,
+       password,
+       roles,
+     } : roles === 'administrador' ? {
+       Nombre,
+       Apellido,
+       Telefono,
+       Email,
+       password,
+       roles,
+     } : {
+       Nombre,
+       Apellido,
+       Telefono,
+       Email,
+       Nacionalidad,
+       password,
+       roles,
+     }),
+   };
 
-  try {
-    const result = await registerUser(userData);
-    if (result.success) {
-      Alert.alert("Registro Exitoso", "Tu cuenta ha sido creada correctamente.", [
-        {
-          text: "OK",
-          onPress: () => navigation.navigate("Login"),
-        },
-      ]);
-    } else {
-      let errorMessage =typeof result.message === "string"? result.message : result.message?.message || JSON.stringify(result.message);
-      Alert.alert("Error", errorMessage || "Ocurrió un error en el registro");
-    }
-  } catch (error) {
-    Alert.alert("Error", "Error inesperado en el registro");
-    console.error(error);
-  } finally {
-    setLoading(false);
-  }
-};
+   try {
+     const result = await registerUser(userData);
+     if (result.success) {
+       Alert.alert("Registro Exitoso", "Tu cuenta ha sido creada correctamente.", [
+         {
+           text: "OK",
+           onPress: () => navigation.navigate("Login"),
+         },
+       ]);
+     } else {
+       let errorMessage =typeof result.message === "string"? result.message : result.message?.message || JSON.stringify(result.message);
+       Alert.alert("Error", errorMessage || "Ocurrió un error en el registro");
+     }
+   } catch (error) {
+     Alert.alert("Error", "Error inesperado en el registro");
+     console.error(error);
+   } finally {
+     setLoading(false);
+   }
+ };
 
   return (
-    <KeyboardAvoidingView  //Contenedor que ajusta su comportamiento cuando aparece el teclado.
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
@@ -115,47 +121,50 @@ const handleRegister = async () => {
           Regístrate en <Text style={styles.appName}>WorldTravels</Text> y descubre el mundo de los viajes 🗺️.
         </Text>
 
-       
-        <TextInput
-          style={styles.input}
-          placeholder=" Nombre"
-          value={Nombre}
-          onChangeText={setName}
-        />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Apellido"
-          value={Apellido}
-          onChangeText={setApellido}
-        />
+        {roles !== 'empresa' && (
+          <>
+            <TextInput
+              style={styles.input}
+              placeholder=" Nombre"
+              value={Nombre}
+              onChangeText={setName}
+            />
 
+            <TextInput
+              style={styles.input}
+              placeholder="Apellido"
+              value={Apellido}
+              onChangeText={setApellido}
+            />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Teléfono"
-          value={Telefono}
-          onChangeText={setTelefono}
-          keyboardType="phone-pad"
-        />
+            <TextInput
+              style={styles.input}
+              placeholder="Teléfono"
+              value={Telefono}
+              onChangeText={setTelefono}
+              keyboardType="phone-pad"
+            />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Correo electrónico"
-          value={Email}
-          onChangeText={setEmail}
+            <TextInput
+              style={styles.input}
+              placeholder="Correo electrónico"
+              value={Email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+            />
 
-          autoCapitalize="none"
-        />
-
-        {roles === 'usuario' && (
-          <TextInput
-            style={styles.input}
-            placeholder="Nacionalidad"
-            value={Nacionalidad}
-            onChangeText={setNacionalidad}
-          />
+            {roles === 'usuario' && (
+              <TextInput
+                style={styles.input}
+                placeholder="Nacionalidad"
+                value={Nacionalidad}
+                onChangeText={setNacionalidad}
+              />
+            )}
+          </>
         )}
+
 
         {roles === 'empresa' && (
           <>
@@ -168,6 +177,13 @@ const handleRegister = async () => {
 
             <TextInput
               style={styles.input}
+              placeholder="NIT de la Empresa"
+              value={NitEmpresa}
+              onChangeText={setNitEmpresa}
+            />
+
+            <TextInput
+              style={styles.input}
               placeholder="Dirección de la Empresa"
               value={DireccionEmpresa}
               onChangeText={setDireccionEmpresa}
@@ -175,13 +191,21 @@ const handleRegister = async () => {
 
             <TextInput
               style={styles.input}
-              placeholder="Teléfono de la Empresa"
-              value={TelefonoEmpresa}
-              onChangeText={setTelefonoEmpresa}
-              keyboardType="phone-pad"
+              placeholder="Ciudad de la Empresa"
+              value={CiudadEmpresa}
+              onChangeText={setCiudadEmpresa}
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Correo electrónico"
+              value={Email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
             />
           </>
         )}
+        
 
         <TextInput
           style={styles.input}

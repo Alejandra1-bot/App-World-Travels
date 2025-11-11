@@ -7,9 +7,9 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  useColorScheme
+  TouchableOpacity,
+  ActivityIndicator
 } from "react-native";
-import BottonComponent from "../../Components/BottonComponents";
 import { useState } from "react";
 import { loginUser } from "../../Src/Navegation/Service/AuthService";
 import { useAppContext } from "../../Screen/Configuracion/AppContext";
@@ -20,33 +20,18 @@ export default function Login({ navigation }) {
   const [loading, setLoading] = useState(false);
   const { login } = useAppContext();
 
-  const theme = useColorScheme(); // "light" | "dark"
-
-  const colors = theme === "dark"
-    ? {
-        background: "#0F172A",
-        card: "#1E293B",
-        text: "#F1F5F9",
-        subtext: "#94A3B8",
-        border: "#334155",
-        inputBg: "#1E293B",
-      }
-    : {
-        background: "#E0F2FE",
-        card: "#fff",
-        text: "#0F172A",
-        subtext: "#64748B",
-        border: "#CBD5E1",
-        inputBg: "#F8FAFC",
-      };
-
   const handleLogin = async () => {
+    if (!Email || !password) {
+      Alert.alert("Error", "Por favor ingresa tu email y contraseña");
+      return;
+    }
+
     setLoading(true);
     try {
       const result = await loginUser(Email, password);
       if (result.success) {
         const token = result.token;
-        const role = result.role || 'usuario'; // default if not provided
+        const role = result.role || 'usuario';
         const userId = result.userId;
         await login(token, role, userId);
         Alert.alert("Éxito", "Inicio de sesión exitoso");
@@ -68,11 +53,11 @@ export default function Login({ navigation }) {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
     >
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
+      <View style={styles.card}>
         {/* Logo */}
         <Image
           source={{ uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" }}
@@ -80,19 +65,16 @@ export default function Login({ navigation }) {
         />
 
         {/* Título */}
-        <Text style={[styles.titulo, { color: colors.text }]}>🏥 World Travels</Text>
-        <Text style={[styles.subtitulo, { color: colors.subtext }]}>
-          Accede a tu cuenta para continuar
+        <Text style={styles.titulo}>🌍 World Travels</Text>
+        <Text style={styles.subtitulo}>
+          Inicia sesión para explorar el mundo
         </Text>
 
         {/* Inputs */}
         <TextInput
-          style={[
-            styles.input,
-            { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text },
-          ]}
+          style={styles.input}
           placeholder="📧 Correo electrónico"
-          placeholderTextColor={colors.subtext}
+          placeholderTextColor="#64748B"
           value={Email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -100,31 +82,40 @@ export default function Login({ navigation }) {
         />
 
         <TextInput
-          style={[
-            styles.input,
-            { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text },
-          ]}
+          style={styles.input}
           placeholder="🔒 Contraseña"
-          placeholderTextColor={colors.subtext}
+          placeholderTextColor="#64748B"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
           editable={!loading}
         />
 
-              <BottonComponent 
-          title="✅ Iniciar Sesión"  
-          onPress={handleLogin} 
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleLogin}
           disabled={loading}
-          gradient // este activa el gradiente
-        />
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>🚀 Iniciar Sesión</Text>
+          )}
+        </TouchableOpacity>
 
-        <BottonComponent
-          title="¿No tienes cuenta? Regístrate"
+        <TouchableOpacity
+          style={styles.registerButton}
           onPress={() => navigation.navigate("Registro")}
-          style={{ backgroundColor: "#0A2647", paddingVertical: 14, paddingHorizontal: 20, borderRadius: 25 }}
-        />
+        >
+          <Text style={styles.registerText}>¿No tienes cuenta? Regístrate</Text>
+        </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.forgotButton}
+          onPress={() => navigation.navigate("RecuperarContrasena")}
+        >
+          <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
+        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
@@ -134,56 +125,86 @@ export default function Login({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EAF6FF", // Fondo claro tipo cielo
+    backgroundColor: "#E0F2FE",
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
   },
-  titulo: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#003366", // Azul profundo
-    marginBottom: 6,
-    textAlign: "center",
-  },
-  subtitulo: {
-    fontSize: 15,
-    color: "#555",
-    marginBottom: 22,
-    textAlign: "center",
-    fontStyle: "italic",
-  },
-  form: {
+  card: {
     width: "100%",
     backgroundColor: "#FFFFFF",
-    padding: 25,
-    borderRadius: 18,
+    padding: 30,
+    borderRadius: 20,
     shadowColor: "#000",
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 10,
     elevation: 5,
+    alignItems: "center",
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    marginBottom: 20,
+  },
+  titulo: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#0F172A",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  subtitulo: {
+    fontSize: 16,
+    color: "#64748B",
+    marginBottom: 30,
+    textAlign: "center",
   },
   input: {
     width: "100%",
-    padding: 14,
+    padding: 15,
     borderWidth: 1,
-    borderColor: "#cfd9e6",
+    borderColor: "#CBD5E1",
     borderRadius: 12,
     marginBottom: 15,
-    backgroundColor: "#F9FBFF",
-    fontSize: 14,
+    backgroundColor: "#F8FAFC",
+    fontSize: 16,
+    color: "#0F172A",
   },
-  linkContainer: {
-    marginTop: 15,
+  button: {
+    width: "100%",
+    backgroundColor: "#0A74DA",
+    paddingVertical: 15,
+    borderRadius: 12,
     alignItems: "center",
+    marginTop: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
   },
-  link: {
-    fontSize: 14,
-    color: "#444",
+  buttonDisabled: {
+    backgroundColor: "#94A3B8",
   },
-  linkStrong: {
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
     fontWeight: "bold",
+  },
+  registerButton: {
+    marginTop: 20,
+  },
+  registerText: {
     color: "#0A74DA",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  forgotButton: {
+    marginTop: 15,
+  },
+  forgotText: {
+    color: "#64748B",
+    fontSize: 14,
   },
 });

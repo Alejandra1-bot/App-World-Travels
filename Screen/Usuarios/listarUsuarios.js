@@ -7,7 +7,9 @@ import {
   TouchableOpacity, 
   StyleSheet 
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { listarUsuarios, eliminarUsuarios } from "../../Src/Navegation/Service/UsuariosService";
+import { bloquearUsuario } from "../../Src/Navegation/Service/UsuariosService";
 import { useNavigation } from "@react-navigation/native";
 import UsuariosCard from "../../Components/UsuariosCard";
 import { useEffect, useState } from "react";
@@ -76,6 +78,32 @@ export default function ListarUsuarios() {
     );
   };
 
+  const handleBloquear = (id) => {
+    Alert.alert(
+      "Confirmar Acción",
+      "¿Estás seguro de cambiar el estado de bloqueo de este usuario?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Confirmar",
+          onPress: async () => {
+            try {
+              const result = await bloquearUsuario(id);
+              if (result.success) {
+                Alert.alert("Éxito", result.data.message);
+                handleUsuarios();
+              } else {
+                Alert.alert("Error", result.message || "No se pudo cambiar el estado");
+              }
+            } catch (error) {
+              Alert.alert("Error", "No se pudo cambiar el estado");
+            }
+          },
+        },
+      ]
+    );
+  };
+
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -85,14 +113,19 @@ export default function ListarUsuarios() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Lista de Usuarios</Text>
+      </View>
       <FlatList
         data={usuarios}
         keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
           <UsuariosCard
             usuario={item}
             onEdit={() => handleEditar(item)}
+            onBlock={() => handleBloquear(item.id)}
             onDelete={() => handleEliminar(item.id)}
             userRole={userRole}
             onPress={() => navigation.navigate("detalleUsuario", { usuario: item })}
@@ -104,8 +137,8 @@ export default function ListarUsuarios() {
       />
 
       {/* {(userRole === 'administrador') && ( */}
-        <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
-          <Text style={styles.textBotton}>+Nuevo Usuario</Text>
+        <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
+          <Text style={styles.floatingButtonText}>Nuevo Usuario</Text>
         </TouchableOpacity>
       {/* )} */}
     </View>
@@ -113,6 +146,49 @@ export default function ListarUsuarios() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  floatingButton: {
+    position: "absolute",
+    bottom: 20,
+    left: '50%',
+    marginLeft: -80, // Ajustar según el ancho aproximado
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    backgroundColor: "#007bff",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  floatingButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  header: {
+    backgroundColor: "#e8f4fd",
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#333",
+    textAlign: "center",
+  },
+  listContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 10,
+  },
   centered: {
     flex: 1,
     justifyContent: "center",
@@ -120,20 +196,8 @@ const styles = StyleSheet.create({
   },
   empty: {
     textAlign: "center",
-    marginTop: 20,
+    marginTop: 50,
     fontSize: 16,
-    color: "#555",
-  },
-  botonCrear: {
-    backgroundColor: "#0a18d6ff",
-    padding: 16,
-    borderRadius: 30,
-    margin: 16,
-    alignItems: "center",
-  },
-  textBotton: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
+    color: "#999",
   },
 });
