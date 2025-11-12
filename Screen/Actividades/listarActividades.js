@@ -49,11 +49,11 @@ export default function ListarActividades() {
   }, [navigation]);
 
   const handleEditar = (actividad) => {
-    navigation.navigate("EditarActividad", { actividad });
+    navigation.navigate("editarActividad", { actividad });
   };
 
   const handleCrear = () => {
-    navigation.navigate("EditarActividad");
+    navigation.navigate("editarActividad");
   };
 
   const handleEliminar = (id) => {
@@ -112,11 +112,11 @@ export default function ListarActividades() {
         }
       />
 
-      {(userRole === 'administrador' || userRole === 'empresa') && (
+      {/* {(userRole === 'administrador' || userRole === 'empresa') && ( */}
         <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
           <Text style={styles.textBotton}>+Nueva Actividad</Text>
         </TouchableOpacity>
-      )}
+      {/* )} */}
     </View>
   );
 }

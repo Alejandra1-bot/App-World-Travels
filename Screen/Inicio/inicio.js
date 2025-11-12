@@ -1,170 +1,260 @@
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
-import CardComponents from "../../Components/CardComponents";
-import BottonComponent from "../../Components/BottonComponents";
+import { ScrollView, StyleSheet, View, Text } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import CardComponents from "../../components/CardComponent";
+import { useAppContext } from "../Configuracion/AppContext";
 
 export default function Inicio({ navigation }) {
+  const { colors, texts, userRole } = useAppContext();
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.welcomeCard}>
-        <Ionicons name="sunny" size={50} color="#FFD700" />
-        <Text style={styles.welcomeTitle}>¡Hola, Viajero!</Text>
-        <Text style={styles.welcomeSubtitle}>Bienvenido a World Travels</Text>
-        <Text style={styles.welcomeText}>Descubre nuevas aventuras en Boyacá y más allá</Text>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* ================= ENCABEZADO ================= */}
+      <View style={styles.header}>
+        <Ionicons name="earth-outline" size={60} color="#FACC15" />
+        <Text style={styles.headerTitle}>🌍 World Travels</Text>
+        <Text style={styles.cloudText}>Explora, descubre y reserva experiencias únicas</Text>
+        <Text style={styles.status}>✨ Plataforma activa</Text>
+        <Text style={styles.subtitle}>Selecciona una opción para continuar</Text>
       </View>
 
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Ionicons name="map" size={30} color="#0A74DA" />
-          <Text style={styles.statNumber}>25</Text>
-          <Text style={styles.statLabel}>Actividades</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Ionicons name="bookmark" size={30} color="#0A74DA" />
-          <Text style={styles.statNumber}>12</Text>
-          <Text style={styles.statLabel}>Reservas</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Ionicons name="star" size={30} color="#0A74DA" />
-          <Text style={styles.statNumber}>4.8</Text>
-          <Text style={styles.statLabel}>Calificación</Text>
-        </View>
-      </View>
+      {/* ================= GRID DE TARJETAS ================= */}
+      <View style={styles.gridContainer}>
+        {userRole === "administrador" ? (
+          <>
+            <CardComponents
+              key="usuarios"
+              tittle="Usuarios"
+              description="Gestión de usuarios del sistema."
+              icon="people-outline"
+              color="#2563EB"
+              onPress={() => navigation.navigate("UsuariosFlow")}
+            />
 
-      <View style={styles.quickActions}>
-        <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
-        <View style={styles.actionsGrid}>
-          <TouchableOpacity style={styles.actionCard} onPress={() => navigation.navigate('Modulos')}>
-            <Ionicons name="grid" size={30} color="#0A74DA" />
-            <Text style={styles.actionText}>Ver Módulos</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionCard} onPress={() => navigation.navigate('Perfil')}>
-            <Ionicons name="person" size={30} color="#0A74DA" />
-            <Text style={styles.actionText}>Mi Perfil</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionCard} onPress={() => navigation.navigate('Configuracion')}>
-            <Ionicons name="settings" size={30} color="#0A74DA" />
-            <Text style={styles.actionText}>Configuración</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionCard} onPress={() => alert('Buscar actividades')}>
-            <Ionicons name="search" size={30} color="#0A74DA" />
-            <Text style={styles.actionText}>Buscar</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+            <CardComponents
+              key="actividades"
+              tittle="Actividades"
+              description="Administrar las actividades turísticas."
+              icon="map-outline"
+              color="#10B981"
+              onPress={() => navigation.navigate("ActividadesFlow")}
+            />
 
-      <View style={styles.recentContainer}>
-        <Text style={styles.sectionTitle}>Actividades Populares</Text>
-        <View style={styles.gridContainer}>
-        </View>
+            <CardComponents
+              key="categorias"
+              tittle="Categorías"
+              description="Clasifica las actividades por tipo."
+              icon="pricetags-outline"
+              color="#F59E0B"
+              onPress={() => navigation.navigate("CategoriasFlow")}
+            />
+
+            <CardComponents
+              key="municipios"
+              tittle="Municipios"
+              description="Gestiona los municipios turísticos."
+              icon="business-outline"
+              color="#8B5CF6"
+              onPress={() => navigation.navigate("MunicipiosFlow")}
+            />
+
+            <CardComponents
+              key="reservas"
+              tittle="Reservas"
+              description="Gestión completa de reservas."
+              icon="calendar-outline"
+              color="#EF4444"
+              onPress={() => navigation.navigate("ReservasFlow")}
+            />
+
+            <CardComponents
+              key="comentarios"
+              tittle="Comentarios"
+              description="Moderar y gestionar opiniones de usuarios."
+              icon="chatbubbles-outline"
+              color="#06B6D4"
+              onPress={() => navigation.navigate("ComentariosFlow")}
+            />
+          </>
+        ) : userRole === "guia" ? (
+          <>
+            <CardComponents
+              key="actividades"
+              tittle="Mis Actividades"
+              description="Gestiona las experiencias que ofreces."
+              icon="map-outline"
+              color="#10B981"
+              onPress={() => navigation.navigate("ActividadesFlow")}
+            />
+
+            <CardComponents
+              key="reservas"
+              tittle="Reservas"
+              description="Consulta las reservas de tus actividades."
+              icon="calendar-outline"
+              color="#F59E0B"
+              onPress={() => navigation.navigate("ReservasFlow")}
+            />
+
+            <CardComponents
+              key="comentarios"
+              tittle="Comentarios"
+              description="Lee los comentarios de los turistas."
+              icon="chatbubbles-outline"
+              color="#06B6D4"
+              onPress={() => navigation.navigate("ComentariosFlow")}
+            />
+          </>
+        ) : userRole === "turista" ? (
+          <View style={styles.infoSection}>
+            <Text style={styles.infoTitle}>🌴 Explora Colombia con World Travels</Text>
+
+            <View style={styles.servicesGrid}>
+              <View style={styles.serviceCard}>
+                <View style={styles.serviceIcon}>
+                  <Text style={styles.iconText}>🗺️</Text>
+                </View>
+                <Text style={styles.serviceTitle}>Actividades</Text>
+                <Text style={styles.serviceText}>
+                  Descubre tours y aventuras inolvidables en todo el país.
+                </Text>
+              </View>
+
+              <View style={styles.serviceCard}>
+                <View style={styles.serviceIcon}>
+                  <Text style={styles.iconText}>🏙️</Text>
+                </View>
+                <Text style={styles.serviceTitle}>Municipios</Text>
+                <Text style={styles.serviceText}>
+                  Explora los destinos más bellos de cada región.
+                </Text>
+              </View>
+
+              <View style={styles.serviceCard}>
+                <View style={styles.serviceIcon}>
+                  <Text style={styles.iconText}>📝</Text>
+                </View>
+                <Text style={styles.serviceTitle}>Comentarios</Text>
+                <Text style={styles.serviceText}>
+                  Lee experiencias reales de otros viajeros.
+                </Text>
+              </View>
+
+              <View style={styles.serviceCard}>
+                <View style={styles.serviceIcon}>
+                  <Text style={styles.iconText}>🎫</Text>
+                </View>
+                <Text style={styles.serviceTitle}>Reservas</Text>
+                <Text style={styles.serviceText}>
+                  Gestiona tus próximas aventuras y reservas activas.
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.tipsSection}>
+              <Text style={styles.tipsTitle}>💡 Consejos para tu viaje</Text>
+              <View style={styles.tipsContainer}>
+                <Text style={styles.tipItem}>• Lleva ropa cómoda y ligera.</Text>
+                <Text style={styles.tipItem}>• Respeta las culturas locales.</Text>
+                <Text style={styles.tipItem}>• Hidrátate constantemente.</Text>
+                <Text style={styles.tipItem}>• Reserva con anticipación.</Text>
+                <Text style={styles.tipItem}>• Captura cada momento 📸</Text>
+              </View>
+            </View>
+          </View>
+        ) : null}
       </View>
     </ScrollView>
   );
 }
 
- const styles = StyleSheet.create({
-   container: {
-     flexGrow: 1,
-     backgroundColor: '#EAF6FF',
-     padding: 20,
-   },
-   welcomeCard: {
-     backgroundColor: '#FFFFFF',
-     borderRadius: 20,
-     padding: 30,
-     alignItems: 'center',
-     marginBottom: 30,
-     shadowColor: '#000',
-     shadowOpacity: 0.1,
-     shadowOffset: { width: 0, height: 4 },
-     shadowRadius: 10,
-     elevation: 5,
-   },
-   welcomeTitle: {
-     fontSize: 28,
-     fontWeight: 'bold',
-     color: '#003366',
-     marginTop: 10,
-     marginBottom: 5,
-   },
-   welcomeSubtitle: {
-     fontSize: 18,
-     color: '#0A74DA',
-     fontWeight: '600',
-   },
-   welcomeText: {
-     fontSize: 14,
-     color: '#555',
-     textAlign: 'center',
-     marginTop: 5,
-   },
-   statsContainer: {
-     flexDirection: 'row',
-     justifyContent: 'space-around',
-     marginBottom: 30,
-   },
-   statCard: {
-     alignItems: 'center',
-     backgroundColor: '#FFFFFF',
-     padding: 20,
-     borderRadius: 15,
-     minWidth: 80,
-     shadowColor: '#000',
-     shadowOpacity: 0.05,
-     shadowOffset: { width: 0, height: 2 },
-     shadowRadius: 4,
-     elevation: 2,
-   },
-   statNumber: {
-     fontSize: 24,
-     fontWeight: 'bold',
-     color: '#0A74DA',
-     marginTop: 5,
-   },
-   statLabel: {
-     fontSize: 12,
-     color: '#555',
-     marginTop: 2,
-   },
-   quickActions: {
-     marginBottom: 30,
-   },
-   sectionTitle: {
-     fontSize: 20,
-     fontWeight: 'bold',
-     color: '#003366',
-     marginBottom: 15,
-   },
-   actionsGrid: {
-     flexDirection: 'row',
-     flexWrap: 'wrap',
-     justifyContent: 'space-between',
-   },
-   actionCard: {
-     width: '48%',
-     backgroundColor: '#FFFFFF',
-     padding: 20,
-     borderRadius: 15,
-     alignItems: 'center',
-     marginBottom: 15,
-     shadowColor: '#000',
-     shadowOpacity: 0.05,
-     shadowOffset: { width: 0, height: 2 },
-     shadowRadius: 4,
-     elevation: 2,
-   },
-   actionText: {
-     fontSize: 14,
-     color: '#555',
-     marginTop: 10,
-     textAlign: 'center',
-   },
-   recentContainer: {
-     marginBottom: 20,
-   },
-   gridContainer: {
-     flexDirection: 'row',
-     flexWrap: 'wrap',
-     justifyContent: 'space-around',
-   },
- });
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#F9FAFB" },
+  header: {
+    backgroundColor: "#0284C7",
+    paddingVertical: 55,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    marginBottom: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  headerTitle: { fontSize: 26, fontWeight: "bold", color: "#fff", marginTop: 10 },
+  cloudText: { fontSize: 14, color: "#E0F2FE", textAlign: "center", marginVertical: 5 },
+  status: { fontSize: 16, color: "#BAE6FD", marginBottom: 6 },
+  subtitle: { fontSize: 14, color: "#F0F9FF", marginTop: 2 },
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+    paddingHorizontal: 10,
+    marginBottom: 20,
+  },
+  infoSection: { width: "100%", paddingHorizontal: 20, marginTop: 20 },
+  infoTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#0f172a",
+    textAlign: "center",
+    marginBottom: 25,
+  },
+  servicesGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginBottom: 25,
+  },
+  serviceCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 15,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 6,
+    width: "48%",
+    alignItems: "center",
+  },
+  serviceIcon: {
+    backgroundColor: "#0284C7",
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  iconText: { fontSize: 28 },
+  serviceTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#1F2937",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  serviceText: { fontSize: 12, color: "#6B7280", textAlign: "center", lineHeight: 18 },
+  tipsSection: {
+    backgroundColor: "#E0F2FE",
+    borderRadius: 20,
+    padding: 20,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+  },
+  tipsTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1F2937",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  tipItem: { fontSize: 14, color: "#374151", marginBottom: 8, lineHeight: 20 },
+});

@@ -1,7 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_BASE_URL="http://10.2.234.203:8000/api";
+const API_BASE_URL="http://10.2.232.158:8000/api";
 
 // const API_BASE_URL="https://noninterpretive-lizabeth-accusatival.ngrok-free.dev/api";
 
@@ -14,7 +14,7 @@ const api = axios.create({
      },
 });
 
-const RutasPublicas = ['/login', '/registrar', '/actualizarMedicos']; //rutas de api que no requieren autenticacion
+const RutasPublicas = ['/login', '/registrar']; //rutas de api que no requieren autenticacion
 
 api.interceptors.request.use(
 

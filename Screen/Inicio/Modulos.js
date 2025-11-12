@@ -28,12 +28,7 @@ export default function Modulos({ navigation }) {
           icon="airplane-outline"
           onPress={() => navigation.navigate('ActividadesFlow')}
         />
-        <CardComponents
-          tittle="Destinos"
-          description="Administra los departamentos y lugares de destino."
-          icon="map-outline"
-          onPress={() => navigation.navigate('DepartamentosFlow')}
-        />
+       
         <CardComponents
           tittle="Comentarios"
           description="Gestiona las reseñas y feedback de los viajeros."
@@ -64,6 +59,18 @@ export default function Modulos({ navigation }) {
           icon="people-outline"
           onPress={() => navigation.navigate('UsuariosFlow')}
         />
+        <CardComponents
+          tittle="Administradores"
+          description="Gestiona los administradores del sistema."
+          icon="shield-checkmark-outline"
+          onPress={() => navigation.navigate('AdministradoresFlow')}
+        />
+        <CardComponents
+          tittle="Empresas"
+          description="Administra las empresas registradas."
+          icon="business-outline"
+          onPress={() => navigation.navigate('EmpresasFlow')}
+        />
       </View>
     </ScrollView>
   );
@@ -72,70 +79,80 @@ export default function Modulos({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#EAF6FF',
-    paddingBottom: 20,
+    backgroundColor: '#F8FAFC',
+    paddingBottom: 30,
   },
   header: {
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    marginBottom: 20,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    backgroundColor: '#667EEA',
+    padding: 25,
+    marginBottom: 25,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 10,
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 20,
   },
   headerText: {
-    marginLeft: 15,
+    marginLeft: 20,
     flex: 1,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#0A74DA',
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   headerSubtitle: {
-    fontSize: 16,
-    color: '#64748B',
-    marginTop: 2,
+    fontSize: 18,
+    color: '#E0E7FF',
+    marginTop: 4,
+    fontStyle: 'italic',
   },
   welcomeCard: {
-    backgroundColor: '#F0F9FF',
-    padding: 15,
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#0A74DA',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    padding: 20,
+    borderRadius: 15,
+    borderLeftWidth: 5,
+    borderLeftColor: '#667EEA',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   welcomeText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 5,
+    color: '#1E293B',
+    marginBottom: 8,
   },
   welcomeSubtext: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#64748B',
-    lineHeight: 20,
+    lineHeight: 22,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#003366',
+    color: '#1E293B',
     textAlign: 'center',
-    marginBottom: 20,
-    marginTop: 10,
+    marginBottom: 25,
+    marginTop: 15,
+    letterSpacing: 1,
   },
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
   },
 });

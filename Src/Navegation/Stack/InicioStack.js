@@ -8,56 +8,53 @@ import InicioAdmin from '../../../Screen/Inicio/InicioAdmin';
 import InicioEmpresa from '../../../Screen/Inicio/InicioEmpresa';
 import ActividadesStack from './ActividadesStack'
 import ComentariosStack from './ComentariosStack';
-import DepartamentosStack from './DepartamentosStack';
 import MunicipiosStack from './MunicipiosStack';
 import ReservasStack from './ReservasStack';
 import Categorias_ActividadesStack from './Categorias_ActividadesStack';
 import UsuariosStack from './UsuariosStack';
+import AdministradoresStack from './AdministradoresStack';
+import EmpresasStack from './EmpresasStack';
  
 
-const Tab = createBottomTabNavigator();
+// const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function TabNavigator() {
-  const { userRole } = useAppContext();
+// function TabNavigator() {
+//   const { userRole } = useAppContext();
 
-  // Determinar qué componente mostrar según el rol
-  const getHomeComponent = () => {
-    switch (userRole) {
-      case 'administrador':
-        return InicioAdmin;
-      case 'empresa':
-        return InicioEmpresa;
-      default:
-        return Modulos;
-    }
-  };
+//   // Determinar qué componente mostrar según el rol
+//   const getHomeComponent = () => {
+//     switch (userRole) {
+//       case 'administrador':
+//         return InicioAdmin;
+//       case 'empresa':
+//         return InicioEmpresa;
+//       default:
+//         return Modulos;
+//     }
+//   };
 
-  const HomeComponent = getHomeComponent();
+//   const HomeComponent = getHomeComponent();
 
-  return (
-    <Tab.Navigator>
-      <Tab.Screen
-        name="Inicio"
-        component={HomeComponent}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
-}
+//   return (
+//     <Tab.Navigator>
+//       <Tab.Screen
+//         name="Inicio"
+//         component={HomeComponent}
+//         options={{
+//           tabBarIcon: ({ color, size }) => (
+//             <Ionicons name="home" size={size} color={color} />
+//           ),
+//         }}
+//       />
+//     </Tab.Navigator>
+//   );
+// }
 
 export default function InicioStack(){
     return(
         <Stack.Navigator>
-            <Stack.Screen
-                name="TabNavigator"
-                component={TabNavigator}
-                options={{ headerShown: false }}
-            />
+           
             <Stack.Screen
                 name="Modulos"
                 component={Modulos}
@@ -71,11 +68,6 @@ export default function InicioStack(){
             <Stack.Screen
                 name="ComentariosFlow"
                 component={ComentariosStack}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="DepartamentosFlow"
-                component={DepartamentosStack}
                 options={{ headerShown: false }}
             />
             <Stack.Screen
@@ -96,6 +88,16 @@ export default function InicioStack(){
             <Stack.Screen
                 name="UsuariosFlow"
                 component={UsuariosStack}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="AdministradoresFlow"
+                component={AdministradoresStack}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="EmpresasFlow"
+                component={EmpresasStack}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>

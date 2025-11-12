@@ -44,7 +44,7 @@ export default function ActividadCard({ actividad, onEdit, onDelete, userRole, o
         </View>
       </View>
 
-      {(userRole === 'administrador') && (
+      {/* {(userRole === 'administrador') && ( */}
         <View style={styles.actions}>
           <Pressable onPress={onEdit} style={({ pressed }) => [styles.button, styles.editBtn, pressed && styles.pressed]}>
             <Ionicons name="create-outline" size={18} color="#fff" />
@@ -53,7 +53,7 @@ export default function ActividadCard({ actividad, onEdit, onDelete, userRole, o
             <Ionicons name="trash-outline" size={18} color="#fff" />
           </Pressable>
         </View>
-      )}
+      {/* )} */}
     </TouchableOpacity>
   );
 }

@@ -14,25 +14,31 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { crearCategorias, actualizarCategorias } from "../../Src/Navegation/Service/CategoriasService";
 import { useAppContext } from "../Configuracion/AppContext";
 
-export default function EditarCategoria_Actividad() {
+export default function EditarEmpresa() {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const categoria = route.params?.categoria;
-  const { colors } = useAppContext();
+  const empresa = route.params?.empresa;
+  const { colors, texts } = useAppContext();
 
-  const [nombre, setNombre] = useState(categoria ? categoria.nombre || categoria.Nombre : "");
-  const [descripcion, setDescripcion] = useState(categoria ? categoria.descripcion || categoria.Descripcion : "");
+  const [Nombre_Empresa, setNombreEmpresa] = useState(empresa ? empresa.Nombre_Empresa || empresa.nombre_empresa : "");
+  const [Email, setCorreo] = useState(empresa ? empresa.Email || empresa.email : "");
+  const [Telefono, setTelefono] = useState(empresa ? empresa.Telefono || empresa.telefono : "");
+  const [Direccion, setDireccion] = useState(empresa ? empresa.Direccion || empresa.direccion : "");
+  const [NIT, setNit] = useState(empresa ? empresa.NIT || empresa.nit : "");
+  const [Contrasena, setContrasena] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const esEdicion = !!categoria;
+  const esEdicion = !!empresa;
 
   const handleGuardar = async () => {
-    if (!nombre || !descripcion) {
-      Alert.alert("Error", "Por favor, completa todos los campos.");
+    const camposRequeridos = [Nombre_Empresa, Email, Telefono, Direccion, NIT];
+    if (!esEdicion) camposRequeridos.push(Contrasena);
+
+    if (camposRequeridos.some((campo) => !campo || campo === "")) {
+      Alert.alert("Error", "Por favor, completa todos los campos requeridos.");
       return;
     }
 
@@ -40,22 +46,23 @@ export default function EditarCategoria_Actividad() {
     try {
       let result;
       if (esEdicion) {
-        result = await actualizarCategorias(categoria.id, { Nombre_Categoria: nombre, Descripcion: descripcion });
+        // TODO: implement actualizarEmpresa
+        // result = await actualizarEmpresa(empresa.id, { Nombre_Empresa, Email, Telefono, Direccion, NIT });
+        Alert.alert("Info", "Función de actualización no implementada aún");
       } else {
-        result = await crearCategorias({ Nombre_Categoria: nombre, Descripcion: descripcion });
+        // TODO: implement crearEmpresa
+        // result = await crearEmpresa({ Nombre_Empresa, Email, Telefono, Direccion, NIT, Contrasena });
+        Alert.alert("Info", "Función de creación no implementada aún");
       }
 
-      if (result.success) {
-        Alert.alert("Éxito", esEdicion ? "Categoría actualizada" : "Categoría creada correctamente");
-        navigation.goBack();
-      } else {
-        Alert.alert(
-          esEdicion ? "Error al editar la categoría" : "Error al crear la categoría",
-          JSON.stringify(result.message)
-        );
-      }
+      // if (result.success) {
+      //   Alert.alert("Éxito", esEdicion ? "Empresa actualizada" : "Empresa creada correctamente");
+      //   navigation.goBack();
+      // } else {
+      //   Alert.alert("Error", result.message || "No se pudo guardar la empresa");
+      // }
     } catch (error) {
-      Alert.alert("Error", "No se pudo guardar la categoría");
+      Alert.alert("Error", "No se pudo guardar la empresa");
     } finally {
       setLoading(false);
     }
@@ -70,21 +77,50 @@ export default function EditarCategoria_Actividad() {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>{esEdicion ? "Editar Categoría" : "Crear Nueva Categoría"}</Text>
+            <Text style={styles.cardTitle}>{esEdicion ? "Editar Empresa" : "Crear Nueva Empresa"}</Text>
 
             <TextInput
               style={styles.input}
-              placeholder="Nombre de la Categoría"
-              value={nombre}
-              onChangeText={setNombre}
+              placeholder="Nombre de la Empresa"
+              value={Nombre_Empresa}
+              onChangeText={setNombreEmpresa}
             />
             <TextInput
-              style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
-              placeholder="Descripción"
-              value={descripcion}
-              onChangeText={setDescripcion}
-              multiline
+              style={styles.input}
+              placeholder="Correo electrónico"
+              value={Email}
+              onChangeText={setCorreo}
+              keyboardType="email-address"
             />
+            <TextInput
+              style={styles.input}
+              placeholder="Teléfono"
+              value={Telefono}
+              onChangeText={setTelefono}
+              keyboardType="phone-pad"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Dirección"
+              value={Direccion}
+              onChangeText={setDireccion}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="NIT"
+              value={NIT}
+              onChangeText={setNit}
+            />
+
+            {!esEdicion && (
+              <TextInput
+                style={styles.input}
+                placeholder="Contraseña"
+                value={Contrasena}
+                onChangeText={setContrasena}
+                secureTextEntry
+              />
+            )}
 
             <TouchableOpacity
               style={styles.saveButton}
@@ -92,9 +128,7 @@ export default function EditarCategoria_Actividad() {
               disabled={loading}
             >
               <Ionicons name="save" size={24} color="#fff" />
-              <Text style={styles.saveButtonText}>
-                {esEdicion ? "Guardar Cambios" : "Crear Categoría"}
-              </Text>
+              <Text style={styles.saveButtonText}>Guardar Empresa</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

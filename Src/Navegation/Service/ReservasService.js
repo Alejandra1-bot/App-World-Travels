@@ -9,9 +9,9 @@ export const listarReservas= async () => {
         console.error("Error al listar las Reservas:", error.response ? error.response.data : error.message);
         return {
             success: false,
-            message: error.response ? error.response.data : "Error de conexion ",
+            message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
-    }  
+    }
 }
  
 export const eliminarReservas = async (id) => {
@@ -21,8 +21,8 @@ export const eliminarReservas = async (id) => {
     } catch (error) {
         console.error("Error al eliminar la Reserva:", error.response ? error.response.data : error.message);
         return {
-        success: false, 
-        message: error.response ? error.response.data : "Error de conexion ",
+        success: false,
+        message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
     }
 }
@@ -35,7 +35,7 @@ export const crearReservas = async (data) => {
         console.error("Error al crear la Reserva:", error.response ? error.response.data : error.message);
         return {
             success: false,
-            message: error.response ? error.response.data : "Error de conexion ",
+            message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
     }
 };
@@ -47,7 +47,7 @@ export const actualizarReservas = async (id, data) => {
         console.error("Error al editar la Reserva:", error.response ? error.response.data : error.message);
         return {
             success: false,
-            message: error.response ? error.response.data : "Error de conexion ",
+            message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
     }
 };

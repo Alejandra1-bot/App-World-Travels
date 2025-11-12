@@ -9,9 +9,9 @@ export const listarMunicipios= async () => {
         console.error("Error al listar los Municipios:", error.response ? error.response.data : error.message);
         return {
             success: false,
-            message: error.response ? error.response.data : "Error de conexion ",
+            message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
-    }  
+    }
 }
  
 export const eliminarMunicipios = async (id) => {
@@ -21,8 +21,8 @@ export const eliminarMunicipios = async (id) => {
     } catch (error) {
         console.error("Error al eliminar el  Municipio:", error.response ? error.response.data : error.message);
         return {
-        success: false, 
-        message: error.response ? error.response.data : "Error de conexion ",
+        success: false,
+        message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
     }
 }
@@ -35,7 +35,7 @@ export const crearMunicipios = async (data) => {
         console.error("Error al crear el Municipio:", error.response ? error.response.data : error.message);
         return {
             success: false,
-            message: error.response ? error.response.data : "Error de conexion ",
+            message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
     }
 };
@@ -47,7 +47,7 @@ export const actualizarMunicipios = async (id, data) => {
         console.error("Error al editar el Municipio:", error.response ? error.response.data : error.message);
         return {
             success: false,
-            message: error.response ? error.response.data : "Error de conexion ",
+            message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
     }
 };

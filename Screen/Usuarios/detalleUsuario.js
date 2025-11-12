@@ -27,13 +27,7 @@ export default function DetalleUsuario() {
         <Text style={styles.label}>📞 Teléfono:</Text>
         <Text style={styles.value}>{usuario.Telefono}</Text>
 
-        <Text style={styles.label}>🎭 Rol:</Text>
-        <Text style={styles.value}>
-          {(() => {
-            const rol = roles.find(r => r.id == usuario.idRol);
-            return rol ? rol.nombre || rol.Nombre : `ID: ${usuario.idRol}`;
-          })()}
-        </Text>
+       
 
         
       </View>

@@ -1,58 +1,59 @@
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  ActivityIndicator, 
-  Alert, 
-  TouchableOpacity, 
-  StyleSheet 
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  Alert,
+  TouchableOpacity,
+  StyleSheet
 } from "react-native";
-import { listarCategorias, eliminarCategorias } from "../../Src/Navegation/Service/CategoriasService";
 import { useNavigation } from "@react-navigation/native";
-import CategoriaActividadCard from "../../Components/CategoriasCard";
 import { useEffect, useState } from "react";
 import { useAppContext } from "../../Screen/Configuracion/AppContext";
+import EmpresasCard from "../../Components/EmpresasCard";
 
-export default function ListarCategoria_Actividad() {
+export default function ListarEmpresas() {
   const { colors, texts, userRole } = useAppContext();
 
-  const [categoriasActividad, setCategoriasActividad] = useState([]);
+  const [empresas, setEmpresas] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
-  const handleCategoriasActividad = async () => {
+  const handleEmpresas = async () => {
     setLoading(true);
     try {
-      const result = await listarCategorias();
-      if (result.success) {
-        setCategoriasActividad(result.data);
-      } else {
-        Alert.alert("Error", result.message || "No se pudieron cargar las categorías");
-      }
+      // TODO: implement service
+      // const result = await listarEmpresas();
+      // if (result.success) {
+      //   setEmpresas(result.data);
+      // } else {
+      //   Alert.alert("Error", result.message || "No se pudieron cargar las empresas");
+      // }
+      setEmpresas([]); // Placeholder
     } catch (error) {
-      Alert.alert("Error", "No se pudieron cargar las categorías de actividad");
+      Alert.alert("Error", "No se pudieron cargar las empresas");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", handleCategoriasActividad);
+    const unsubscribe = navigation.addListener("focus", handleEmpresas);
     return unsubscribe;
   }, [navigation]);
 
-  const handleEditar = (categoria) => {
-    navigation.navigate("editarCategoria_Actividad", { categoria });
+  const handleEditar = (empresa) => {
+    navigation.navigate("editarEmpresa", { empresa });
   };
 
   const handleCrear = () => {
-    navigation.navigate("editarCategoria_Actividad");
+    navigation.navigate("editarEmpresa");
   };
 
   const handleEliminar = (id) => {
     Alert.alert(
       "Confirmar Eliminación",
-      "¿Estás seguro de eliminar esta categoría?",
+      "¿Estás seguro de eliminar esta empresa?",
       [
         { text: "Cancelar", style: "cancel" },
         {
@@ -60,14 +61,16 @@ export default function ListarCategoria_Actividad() {
           style: "destructive",
           onPress: async () => {
             try {
-              const result = await eliminarCategorias(id);
-              if (result.success) {
-                handleCategoriasActividad();
-              } else {
-                Alert.alert("Error", result.message || "No se pudo eliminar la categoría");
-              }
+              // TODO: implement service
+              // const result = await eliminarEmpresa(id);
+              // if (result.success) {
+              //   handleEmpresas();
+              // } else {
+              //   Alert.alert("Error", result.message || "No se pudo eliminar la empresa");
+              // }
+              Alert.alert("Info", "Función no implementada aún");
             } catch (error) {
-              Alert.alert("Error", "No se pudo eliminar la categoría");
+              Alert.alert("Error", "No se pudo eliminar la empresa");
             }
           },
         },
@@ -86,32 +89,28 @@ export default function ListarCategoria_Actividad() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Lista de Categorías</Text>
+        <Text style={styles.headerTitle}>Lista de Empresas</Text>
       </View>
       <FlatList
-        data={categoriasActividad}
+        data={empresas}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
-          <CategoriaActividadCard
-            categoria={item}
+          <EmpresasCard
+            empresa={item}
             onEdit={() => handleEditar(item)}
             onDelete={() => handleEliminar(item.id)}
             userRole={userRole}
-            onPress={() =>
-              navigation.navigate("DetalleCategoria_Actividad", {
-                categoria: item,
-              })
-            }
+            onPress={() => navigation.navigate("detalleEmpresa", { empresa: item })}
           />
         )}
         ListEmptyComponent={
-          <Text style={styles.empty}>No hay Categorías de Actividad Registradas.</Text>
+          <Text style={styles.empty}>No hay Empresas Registradas.</Text>
         }
       />
 
       <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
-        <Text style={styles.floatingButtonText}>Nueva Categoría</Text>
+        <Text style={styles.floatingButtonText}>Nueva Empresa</Text>
       </TouchableOpacity>
     </View>
   );
@@ -126,7 +125,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
     left: '50%',
-    marginLeft: -80, // Ajustar según el ancho aproximado
+    marginLeft: -80,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 25,

@@ -9,9 +9,9 @@ export const listarPacientes= async () => {
         console.error("Error al listar pacientes:", error.response ? error.response.data : error.message);
         return {
             success: false,
-            message: error.response ? error.response.data : "Error de conexion ",
+            message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
-    }  
+    }
 }
  
 export const eliminarPaciente = async (id) => {
@@ -21,8 +21,8 @@ export const eliminarPaciente = async (id) => {
     } catch (error) {
         console.error("Error al eliminar el  pacientes:", error.response ? error.response.data : error.message);
         return {
-        success: false, 
-        message: error.response ? error.response.data : "Error de conexion ",
+        success: false,
+        message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
     }
 }
@@ -35,7 +35,7 @@ export const crearPaciente = async (data) => {
         // console.error("Error al crear el paciente:", error.response ? error.response.data : error.message);
         return {
             success: false,
-            message: error.response ? error.response.data : "Error de conexion ",
+            message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
     }
 };
@@ -47,7 +47,7 @@ export const editarPaciente = async (id, data) => {
         // console.error("Error al editar el paciente:", error.response ? error.response.data : error.message);
         return {
             success: false,
-            message: error.response ? error.response.data : "Error de conexion ",
+            message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
     }
 };

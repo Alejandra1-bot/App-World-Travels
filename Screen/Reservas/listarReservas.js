@@ -1,133 +1,159 @@
+import { 
+  View, 
+  Text, 
+  FlatList, 
+  ActivityIndicator, 
+  Alert, 
+  TouchableOpacity, 
+  StyleSheet 
+} from "react-native";
+import { listarReservas, eliminarReservas } from "../../Src/Navegation/Service/ReservasService";
+import { useNavigation } from "@react-navigation/native";
+import ReservaCard from "../../Components/ReservasCard";
+import { useEffect, useState } from "react";
+import { useAppContext } from "../../Screen/Configuracion/AppContext";
 
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
-import { useState, useEffect } from "react";
-import { getReservas } from "../../Src/Navegation/Service/ReservasService";
+export default function ListarReservas() {
+  const { colors, texts, userRole } = useAppContext();
 
-export default function ListarReserva({ navigation }) {
-    const [reservas, setReservas] = useState([]);
+  const [reservas, setReservas] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
-    useEffect(() => {
-        setReservas(getReservas());
-    }, []);
+  // Cargar lista de reservas
+  const handleReservas = async () => {
+    setLoading(true);
+    try {
+      const result = await listarReservas();
+      if (result.success) {
+        setReservas(result.data);
+      } else {
+        Alert.alert("Error", result.message || "No se pudieron cargar las reservas");
+      }
+    } catch (error) {
+      Alert.alert("Error", "No se pudieron cargar las reservas");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'Confirmada': return '#4CAF50';
-            case 'Pendiente': return '#FF9800';
-            case 'Cancelada': return '#F44336';
-            default: return '#9E9E9E';
-        }
-    };
+  // Recargar cuando la pantalla vuelva al enfoque
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", handleReservas);
+    return unsubscribe;
+  }, [navigation]);
 
-    const renderItem = ({ item }) => (
-        <TouchableOpacity
-            style={styles.item}
-            onPress={() => navigation.navigate('detalleReserva', { reserva: item })}
-        >
-            <View style={styles.info}>
-                <Text style={styles.activity}>Actividad ID: {item.actividadId}</Text>
-                <Text style={styles.date}>Fecha: {item.fechaReserva}</Text>
-                <Text style={styles.price}>Precio: ${item.precio}</Text>
-                <View style={[styles.status, { backgroundColor: getStatusColor(item.estado) }]}>
-                    <Text style={styles.statusText}>{item.estado}</Text>
-                </View>
-            </View>
-        </TouchableOpacity>
+  // Editar
+  const handleEditar = (reserva) => {
+    navigation.navigate("editarReservas", { reserva });
+  };
+
+  // Crear
+  const handleCrear = () => {
+    navigation.navigate("editarReservas");
+  };
+
+  // Eliminar
+  const handleEliminar = (id) => {
+    Alert.alert(
+      "Confirmar Eliminación",
+      "¿Deseas eliminar esta reserva?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await eliminarReservas(id);
+              if (result.success) {
+                handleReservas();
+              } else {
+                Alert.alert("Error", result.message || "No se pudo eliminar la reserva");
+              }
+            } catch (error) {
+              Alert.alert("Error", "No se pudo eliminar la reserva");
+            }
+          },
+        },
+      ]
     );
+  };
 
+  if (loading) {
     return (
-        <View style={styles.container}>
-            <Text style={styles.headerTitle}>Mis Reservas</Text>
-            <FlatList
-                data={reservas}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
-            />
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('editarReservas', { reserva: null })}
-            >
-                <Ionicons name="add" size={20} color="#FFFFFF" />
-                <Text style={styles.addButtonText}>Nueva Reserva</Text>
-            </TouchableOpacity>
-        </View>
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#007bff" />
+      </View>
     );
+  }
+
+  return (
+    <View style={styles.container}>
+      {/* Encabezado */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Lista de Reservas</Text>
+      </View>
+
+      {/* Lista */}
+      <FlatList
+        data={reservas}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.listContainer}
+        renderItem={({ item }) => (
+          <ReservaCard
+            reserva={item}
+            onEdit={() => handleEditar(item)}
+            onDelete={() => handleEliminar(item.id)}
+            userRole={userRole}
+            onPress={() =>
+              navigation.navigate("DetalleReserva", {
+                reserva: item,
+              })
+            }
+          />
+        )}
+        ListEmptyComponent={
+          <Text style={styles.empty}>No hay reservas registradas.</Text>
+        }
+      />
+
+      {/* Botón Crear */}
+      <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
+        <Text style={styles.floatingButtonText}>Nueva Reserva</Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#EAF6FF',
-    },
-    headerTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 20,
-        color: '#003366',
-    },
-    item: {
-        backgroundColor: '#FFFFFF',
-        padding: 20,
-        marginBottom: 10,
-        borderRadius: 15,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    info: {
-        alignItems: 'center',
-    },
-    activity: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#003366',
-        marginBottom: 5,
-    },
-    date: {
-        fontSize: 14,
-        color: '#0A74DA',
-        marginBottom: 5,
-    },
-    price: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#4CAF50',
-        marginBottom: 5,
-    },
-    status: {
-        alignSelf: 'flex-start',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 15,
-    },
-    statusText: {
-        color: '#FFFFFF',
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    addButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#0A74DA',
-        padding: 15,
-        borderRadius: 15,
-        marginTop: 20,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    addButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginLeft: 10,
-    },
+  container: { flex: 1, backgroundColor: "#ffffff" },
+  floatingButton: {
+    position: "absolute",
+    bottom: 20,
+    left: "50%",
+    marginLeft: -90,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    backgroundColor: "#007bff",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  floatingButtonText: { color: "#fff", fontSize: 14, fontWeight: "bold" },
+  header: {
+    backgroundColor: "#e0f2fe",
+    paddingVertical: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  headerTitle: { fontSize: 24, fontWeight: "600", color: "#333", textAlign: "center" },
+  listContainer: { paddingHorizontal: 16, paddingTop: 10 },
+  centered: { flex: 1, justifyContent: "center", alignItems: "center" },
+  empty: { textAlign: "center", marginTop: 50, fontSize: 16, color: "#999" },
 });

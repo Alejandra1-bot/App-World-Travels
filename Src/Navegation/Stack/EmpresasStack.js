@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import listarEmpresas from '../../../Screen/Empresa/listarEmpresas';
-import editarEmpresa from '../../../Screen/Empresa/editarEmpresa';
-import detalleEmpresa from '../../../Screen/Empresa/detalleEmpresa';
+import listarEmpresas from '../../../Screen/Empresas/listarEmpresas';
+import editarEmpresa from '../../../Screen/Empresas/editarEmpresa';
+import detalleEmpresa from '../../../Screen/Empresas/detalleEmpresa';
 
 const Stack = createNativeStackNavigator();
 
@@ -14,14 +14,14 @@ export default function EmpresasStack() {
         options={{ title: 'Empresas' }}
       />
       <Stack.Screen
-        name="detalleEmpresa"
-        component={detalleEmpresa}
-        options={{ title: 'Detalle Empresa' }}
-      />
-      <Stack.Screen
         name="editarEmpresa"
         component={editarEmpresa}
         options={{ title: 'Editar Empresa' }}
+      />
+      <Stack.Screen
+        name="detalleEmpresa"
+        component={detalleEmpresa}
+        options={{ title: 'Detalle Empresa' }}
       />
     </Stack.Navigator>
   );

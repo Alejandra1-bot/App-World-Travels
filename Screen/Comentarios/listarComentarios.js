@@ -1,130 +1,158 @@
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
-import { useState, useEffect } from "react";
-import { getComentarios } from "../../Src/Navegation/Service/ComentariosService";
+import { 
+  View, 
+  Text, 
+  FlatList, 
+  ActivityIndicator, 
+  Alert, 
+  TouchableOpacity, 
+  StyleSheet 
+} from "react-native";
+import { listarComentarios, eliminarComentarios } from "../../Src/Navegation/Service/ComentariosService";
+import { useNavigation } from "@react-navigation/native";
+import ComentarioCard from "../../Components/ComentariosCard";
+import { useEffect, useState } from "react";
+import { useAppContext } from "../../Screen/Configuracion/AppContext";
 
-export default function ListarComentario({ navigation }) {
-    const [comentarios, setComentarios] = useState([]);
+export default function ListarComentarios() {
+  const { colors, texts, userRole } = useAppContext();
 
-    useEffect(() => {
-        setComentarios(getComentarios());
-    }, []);
+  const [comentarios, setComentarios] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
-    const renderItem = ({ item }) => (
-        <TouchableOpacity
-            style={styles.item}
-            onPress={() => navigation.navigate('detalleComentario', { comentario: item })}
-        >
-            <View style={styles.header}>
-                <View style={styles.userInfo}>
-                    <Text style={styles.userName}>{item.usuario}</Text>
-                    <View style={styles.rating}>
-                        {[...Array(5)].map((_, i) => (
-                            <Ionicons
-                                key={i}
-                                name={i < item.calificacion ? "star" : "star-outline"}
-                                size={16}
-                                color="#FFD700"
-                            />
-                        ))}
-                    </View>
-                </View>
-            </View>
-            <Text style={styles.comment}>{item.comentario}</Text>
-            <Text style={styles.date}>{item.fecha}</Text>
-        </TouchableOpacity>
+  // Cargar lista de comentarios
+  const handleComentarios = async () => {
+    setLoading(true);
+    try {
+      const result = await listarComentarios();
+      if (result.success) {
+        setComentarios(result.data);
+      } else {
+        Alert.alert("Error", result.message || "No se pudieron cargar los comentarios");
+      }
+    } catch (error) {
+      Alert.alert("Error", "No se pudieron cargar los comentarios");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", handleComentarios);
+    return unsubscribe;
+  }, [navigation]);
+
+  // Editar
+  const handleEditar = (comentario) => {
+    navigation.navigate("editarComentario", { comentario });
+  };
+
+  // Crear
+  const handleCrear = () => {
+    navigation.navigate("editarComentario");
+  };
+
+  // Eliminar
+  const handleEliminar = (id) => {
+    Alert.alert(
+      "Eliminar Comentario",
+      "¿Deseas eliminar este comentario?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await eliminarComentarios(id);
+              if (result.success) {
+                handleComentarios();
+              } else {
+                Alert.alert("Error", result.message || "No se pudo eliminar el comentario");
+              }
+            } catch (error) {
+              Alert.alert("Error", "No se pudo eliminar el comentario");
+            }
+          },
+        },
+      ]
     );
+  };
 
+  if (loading) {
     return (
-        <View style={styles.container}>
-            <Text style={styles.headerTitle}>Comentarios</Text>
-            <FlatList
-                data={comentarios}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
-            />
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('editarComentario', { comentario: null })}
-            >
-                <Ionicons name="add" size={20} color="#FFFFFF" />
-                <Text style={styles.addButtonText}>Agregar Comentario</Text>
-            </TouchableOpacity>
-        </View>
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#007bff" />
+      </View>
     );
+  }
+
+  return (
+    <View style={styles.container}>
+      {/* Encabezado */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Lista de Comentarios</Text>
+      </View>
+
+      {/* Lista */}
+      <FlatList
+        data={comentarios}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.listContainer}
+        renderItem={({ item }) => (
+          <ComentarioCard
+            comentario={item}
+            onEdit={() => handleEditar(item)}
+            onDelete={() => handleEliminar(item.id)}
+            userRole={userRole}
+            onPress={() =>
+              navigation.navigate("DetalleComentario", {
+                comentario: item,
+              })
+            }
+          />
+        )}
+        ListEmptyComponent={
+          <Text style={styles.empty}>No hay comentarios registrados.</Text>
+        }
+      />
+
+      {/* Botón Crear */}
+      <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
+        <Text style={styles.floatingButtonText}>Nuevo Comentario</Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#EAF6FF',
-    },
-    headerTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 20,
-        color: '#003366',
-    },
-    item: {
-        backgroundColor: '#FFFFFF',
-        padding: 15,
-        marginBottom: 10,
-        borderRadius: 15,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    userInfo: {
-        marginLeft: 10,
-        flex: 1,
-    },
-    userName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#003366',
-    },
-    rating: {
-        flexDirection: 'row',
-        marginTop: 2,
-    },
-    comment: {
-        fontSize: 14,
-        color: '#555',
-        lineHeight: 20,
-        marginBottom: 5,
-    },
-    date: {
-        fontSize: 12,
-        color: '#999',
-        textAlign: 'right',
-    },
-    addButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#0A74DA',
-        padding: 15,
-        borderRadius: 15,
-        marginTop: 20,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    addButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginLeft: 10,
-    },
+  container: { flex: 1, backgroundColor: "#ffffff" },
+  floatingButton: {
+    position: "absolute",
+    bottom: 20,
+    left: "50%",
+    marginLeft: -90,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    backgroundColor: "#0284C7",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  floatingButtonText: { color: "#fff", fontSize: 14, fontWeight: "bold" },
+  header: {
+    backgroundColor: "#e0f2fe",
+    paddingVertical: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  headerTitle: { fontSize: 24, fontWeight: "600", color: "#333", textAlign: "center" },
+  listContainer: { paddingHorizontal: 16, paddingTop: 10 },
+  centered: { flex: 1, justifyContent: "center", alignItems: "center" },
+  empty: { textAlign: "center", marginTop: 50, fontSize: 16, color: "#999" },
 });

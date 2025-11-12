@@ -2,7 +2,7 @@ import { View, Text, Pressable, StyleSheet, TouchableOpacity } from "react-nativ
 import { Ionicons } from "@expo/vector-icons";
 
 export default function CategoriaCard({ categoria, onEdit, onDelete, userRole }) {
-  const inicial = categoria.nombre ? categoria.nombre.charAt(0).toUpperCase() : "?";
+  const inicial = categoria.Nombre_Categoria ? categoria.Nombre_Categoria.charAt(0).toUpperCase() : "?";
 
   return (
     <TouchableOpacity style={styles.card}>
@@ -11,23 +11,21 @@ export default function CategoriaCard({ categoria, onEdit, onDelete, userRole })
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.nombre}>{categoria.nombre}</Text>
+        <Text style={styles.nombre}>{categoria.Nombre_Categoria}</Text>
         <View style={styles.row}>
           <Ionicons name="information-circle-outline" size={16} color="#555" />
-          <Text style={styles.detalle}> {categoria.descripcion}</Text>
+          <Text style={styles.detalle}> {categoria.Descripcion}</Text>
         </View>
       </View>
 
-      {userRole === "administrador" && (
-        <View style={styles.actions}>
-          <Pressable onPress={onEdit} style={[styles.button, styles.editBtn]}>
-            <Ionicons name="create-outline" size={18} color="#fff" />
-          </Pressable>
-          <Pressable onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
-            <Ionicons name="trash-outline" size={18} color="#fff" />
-          </Pressable>
-        </View>
-      )}
+      <View style={styles.actions}>
+        <Pressable onPress={onEdit} style={[styles.button, styles.editBtn]}>
+          <Ionicons name="create-outline" size={18} color="#fff" />
+        </Pressable>
+        <Pressable onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
+          <Ionicons name="trash-outline" size={18} color="#fff" />
+        </Pressable>
+      </View>
     </TouchableOpacity>
   );
 }
@@ -68,3 +66,4 @@ const styles = StyleSheet.create({
   editBtn: { backgroundColor: "#0a18d6" },
   deleteBtn: { backgroundColor: "#f20c0c" },
 });
+

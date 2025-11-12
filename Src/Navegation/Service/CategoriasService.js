@@ -2,7 +2,7 @@ import api from "./Conexion";
 
 export const listarCategorias= async () => {
     try {
-    const response = await api.get("/categoriasActividades");
+    const response = await api.get("/listarCategorias");
     return {success: true, data: response.data};
 
     } catch (error) {

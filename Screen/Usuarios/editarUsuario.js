@@ -119,7 +119,7 @@ export default function EditarUsuario() {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Crear Nuevo Usuario</Text>
+            <Text style={styles.cardTitle}>{esEdicion ? "Editar Usuario" : "Crear Nuevo Usuario"}</Text>
             <TextInput
               style={styles.input}
               placeholder="Nombre"

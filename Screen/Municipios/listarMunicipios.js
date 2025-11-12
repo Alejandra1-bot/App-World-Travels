@@ -1,133 +1,185 @@
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
-import { useState, useEffect } from "react";
-import { getMunicipios } from "../../Src/Navegation/Service/MunicipiosService";
+import { 
+  View, 
+  Text, 
+  FlatList, 
+  ActivityIndicator, 
+  Alert, 
+  TouchableOpacity, 
+  StyleSheet 
+} from "react-native";
+import { listarMunicipios, eliminarMunicipios } from "../../Src/Navegation/Service/MunicipiosService";
+import { useNavigation } from "@react-navigation/native";
+import MunicipioCard from "../../Components/MunicipiosCard";
+import { useEffect, useState } from "react";
+import { useAppContext } from "../../Screen/Configuracion/AppContext";
 
-export default function ListarMunicipio({ navigation }) {
-    const [municipios, setMunicipios] = useState([]);
+export default function ListarMunicipios() {
+  const { colors, texts, userRole } = useAppContext();
 
-    useEffect(() => {
-        setMunicipios(getMunicipios());
-    }, []);
+  const [municipios, setMunicipios] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
-    const renderItem = ({ item }) => (
-        <TouchableOpacity
-            style={styles.item}
-            onPress={() => navigation.navigate('detalleMunicipio', { municipio: item })}
-        >
-            <View style={styles.info}>
-                <Text style={styles.name}>{item.nombre}</Text>
-                <Text style={styles.department}>Departamento: {item.departamento}</Text>
-                <Text style={styles.description}>{item.descripcion}</Text>
-                <View style={styles.stats}>
-                    <Ionicons name="people" size={16} color="#0A74DA" />
-                    <Text style={styles.statText}>{item.poblacion.toLocaleString()} habitantes</Text>
-                </View>
-            </View>
-            <TouchableOpacity style={styles.mapButton}>
-                <Ionicons name="map" size={20} color="#0A74DA" />
-            </TouchableOpacity>
-        </TouchableOpacity>
+  // Cargar lista de municipios
+  const handleMunicipios = async () => {
+    setLoading(true);
+    try {
+      const result = await listarMunicipios();
+      if (result.success) {
+        setMunicipios(result.data);
+      } else {
+        Alert.alert("Error", result.message || "No se pudieron cargar los municipios");
+      }
+    } catch (error) {
+      Alert.alert("Error", "No se pudieron cargar los municipios");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Recargar al volver al enfoque de la pantalla
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", handleMunicipios);
+    return unsubscribe;
+  }, [navigation]);
+
+  // Navegar a editar
+  const handleEditar = (municipio) => {
+    navigation.navigate("editarMunicipio", { municipio });
+  };
+
+  // Navegar a crear
+  const handleCrear = () => {
+    navigation.navigate("editarMunicipio");
+  };
+
+  // Eliminar municipio
+  const handleEliminar = (id) => {
+    Alert.alert(
+      "Confirmar Eliminación",
+      "¿Estás seguro de eliminar este municipio?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await eliminarMunicipios(id);
+              if (result.success) {
+                handleMunicipios();
+              } else {
+                Alert.alert("Error", result.message || "No se pudo eliminar el municipio");
+              }
+            } catch (error) {
+              Alert.alert("Error", "No se pudo eliminar el municipio");
+            }
+          },
+        },
+      ]
     );
+  };
 
+  // Mostrar carga
+  if (loading) {
     return (
-        <View style={styles.container}>
-            <Text style={styles.headerTitle}>Municipios de Boyacá</Text>
-            <FlatList
-                data={municipios}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
-            />
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('editarMunicipio', { municipio: null })}
-            >
-                <Ionicons name="add" size={20} color="#FFFFFF" />
-                <Text style={styles.addButtonText}>Agregar Municipio</Text>
-            </TouchableOpacity>
-        </View>
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
     );
+  }
+
+  return (
+    <View style={styles.container}>
+      {/* Encabezado */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Lista de Municipios</Text>
+      </View>
+
+      {/* Lista */}
+      <FlatList
+        data={municipios}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.listContainer}
+        renderItem={({ item }) => (
+          <MunicipioCard
+            municipio={item}
+            onEdit={() => handleEditar(item)}
+            onDelete={() => handleEliminar(item.id)}
+            userRole={userRole}
+            onPress={() =>
+              navigation.navigate("DetalleMunicipio", {
+                municipio: item,
+              })
+            }
+          />
+        )}
+        ListEmptyComponent={
+          <Text style={styles.empty}>No hay municipios registrados.</Text>
+        }
+      />
+
+      {/* Botón Crear */}
+      <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
+        <Text style={styles.floatingButtonText}>Nuevo Municipio</Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#EAF6FF',
-    },
-    headerTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 20,
-        color: '#003366',
-    },
-    item: {
-        flexDirection: 'row',
-        backgroundColor: '#FFFFFF',
-        padding: 15,
-        marginBottom: 10,
-        borderRadius: 15,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 2,
-        alignItems: 'center',
-    },
-    info: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    name: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#003366',
-        marginBottom: 5,
-    },
-    department: {
-        fontSize: 14,
-        color: '#0A74DA',
-        marginBottom: 5,
-    },
-    description: {
-        fontSize: 12,
-        color: '#555',
-        marginBottom: 5,
-        lineHeight: 16,
-    },
-    stats: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    statText: {
-        fontSize: 12,
-        color: '#555',
-        marginLeft: 5,
-    },
-    mapButton: {
-        padding: 10,
-        backgroundColor: '#F0F8FF',
-        borderRadius: 20,
-    },
-    addButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#0A74DA',
-        padding: 15,
-        borderRadius: 15,
-        marginTop: 20,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    addButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginLeft: 10,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  floatingButton: {
+    position: "absolute",
+    bottom: 20,
+    left: '50%',
+    marginLeft: -90, // Ajustar según el ancho aproximado
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    backgroundColor: "#007bff",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  floatingButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  header: {
+    backgroundColor: "#e8f4fd",
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#333",
+    textAlign: "center",
+  },
+  listContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 10,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  empty: {
+    textAlign: "center",
+    marginTop: 50,
+    fontSize: 16,
+    color: "#999",
+  },
 });

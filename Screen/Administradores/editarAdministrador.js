@@ -14,25 +14,30 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { crearCategorias, actualizarCategorias } from "../../Src/Navegation/Service/CategoriasService";
 import { useAppContext } from "../Configuracion/AppContext";
 
-export default function EditarCategoria_Actividad() {
+export default function EditarAdministrador() {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const categoria = route.params?.categoria;
-  const { colors } = useAppContext();
+  const administrador = route.params?.administrador;
+  const { colors, texts } = useAppContext();
 
-  const [nombre, setNombre] = useState(categoria ? categoria.nombre || categoria.Nombre : "");
-  const [descripcion, setDescripcion] = useState(categoria ? categoria.descripcion || categoria.Descripcion : "");
+  const [Nombre, setNombre] = useState(administrador ? administrador.nombre || administrador.Nombre : "");
+  const [Apellido, setApellido] = useState(administrador ? administrador.apellido || administrador.Apellido : "");
+  const [Email, setCorreo] = useState(administrador ? administrador.Email || administrador.email : "");
+  const [Telefono, setTelefono] = useState(administrador ? administrador.telefono || administrador.Telefono : "");
+  const [Contrasena, setContrasena] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const esEdicion = !!categoria;
+  const esEdicion = !!administrador;
 
   const handleGuardar = async () => {
-    if (!nombre || !descripcion) {
-      Alert.alert("Error", "Por favor, completa todos los campos.");
+    const camposRequeridos = [Nombre, Apellido, Email, Telefono];
+    if (!esEdicion) camposRequeridos.push(Contrasena);
+
+    if (camposRequeridos.some((campo) => !campo || campo === "")) {
+      Alert.alert("Error", "Por favor, completa todos los campos requeridos.");
       return;
     }
 
@@ -40,22 +45,23 @@ export default function EditarCategoria_Actividad() {
     try {
       let result;
       if (esEdicion) {
-        result = await actualizarCategorias(categoria.id, { Nombre_Categoria: nombre, Descripcion: descripcion });
+        // TODO: implement actualizarAdministrador
+        // result = await actualizarAdministrador(administrador.id, { Nombre, Apellido, Email, Telefono });
+        Alert.alert("Info", "Función de actualización no implementada aún");
       } else {
-        result = await crearCategorias({ Nombre_Categoria: nombre, Descripcion: descripcion });
+        // TODO: implement crearAdministrador
+        // result = await crearAdministrador({ Nombre, Apellido, Email, Telefono, Contrasena });
+        Alert.alert("Info", "Función de creación no implementada aún");
       }
 
-      if (result.success) {
-        Alert.alert("Éxito", esEdicion ? "Categoría actualizada" : "Categoría creada correctamente");
-        navigation.goBack();
-      } else {
-        Alert.alert(
-          esEdicion ? "Error al editar la categoría" : "Error al crear la categoría",
-          JSON.stringify(result.message)
-        );
-      }
+      // if (result.success) {
+      //   Alert.alert("Éxito", esEdicion ? "Administrador actualizado" : "Administrador creado correctamente");
+      //   navigation.goBack();
+      // } else {
+      //   Alert.alert("Error", result.message || "No se pudo guardar el administrador");
+      // }
     } catch (error) {
-      Alert.alert("Error", "No se pudo guardar la categoría");
+      Alert.alert("Error", "No se pudo guardar el administrador");
     } finally {
       setLoading(false);
     }
@@ -70,21 +76,44 @@ export default function EditarCategoria_Actividad() {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>{esEdicion ? "Editar Categoría" : "Crear Nueva Categoría"}</Text>
+            <Text style={styles.cardTitle}>{esEdicion ? "Editar Administrador" : "Crear Nuevo Administrador"}</Text>
 
             <TextInput
               style={styles.input}
-              placeholder="Nombre de la Categoría"
-              value={nombre}
+              placeholder="Nombre"
+              value={Nombre}
               onChangeText={setNombre}
             />
             <TextInput
-              style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
-              placeholder="Descripción"
-              value={descripcion}
-              onChangeText={setDescripcion}
-              multiline
+              style={styles.input}
+              placeholder="Apellido"
+              value={Apellido}
+              onChangeText={setApellido}
             />
+            <TextInput
+              style={styles.input}
+              placeholder="Correo electrónico"
+              value={Email}
+              onChangeText={setCorreo}
+              keyboardType="email-address"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Teléfono"
+              value={Telefono}
+              onChangeText={setTelefono}
+              keyboardType="phone-pad"
+            />
+
+            {!esEdicion && (
+              <TextInput
+                style={styles.input}
+                placeholder="Contraseña"
+                value={Contrasena}
+                onChangeText={setContrasena}
+                secureTextEntry
+              />
+            )}
 
             <TouchableOpacity
               style={styles.saveButton}
@@ -92,9 +121,7 @@ export default function EditarCategoria_Actividad() {
               disabled={loading}
             >
               <Ionicons name="save" size={24} color="#fff" />
-              <Text style={styles.saveButtonText}>
-                {esEdicion ? "Guardar Cambios" : "Crear Categoría"}
-              </Text>
+              <Text style={styles.saveButtonText}>Guardar Administrador</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
