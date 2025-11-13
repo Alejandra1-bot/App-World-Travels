@@ -4,103 +4,92 @@ import { useNavigation } from "@react-navigation/native";
 
 export default function ActividadCard({ actividad, onEdit, onDelete, userRole, onPress }) {
   const navigation = useNavigation();
-  const inicial = actividad.nombre ? actividad.nombre.charAt(0).toUpperCase() : "?";
+  const nombre = actividad.Nombre_Actividad || actividad.nombre;
+  const inicial = nombre ? nombre.charAt(0).toUpperCase() : "?";
 
   return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={onPress || (() => navigation.navigate("DetalleActividad", { actividad }))}
-    >
-      <View style={styles.avatar}>
-        <Text style={styles.avatarText}>{inicial}</Text>
+    <View style={styles.card}>
+      <TouchableOpacity
+        style={styles.cardContent}
+        onPress={onPress || (() => navigation.navigate("detalleActividad", { actividad }))}
+      >
+        <View style={styles.headerRow}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{inicial}</Text>
+          </View>
+          <View style={styles.nameContainer}>
+            <Text style={styles.nombre}>{nombre}</Text>
+          </View>
+        </View>
+        <View style={styles.details}>
+          <Text style={styles.detalle}>Descripción: {actividad.Descripcion || actividad.descripcion}</Text>
+          <Text style={styles.detalle}>Ubicación: {actividad.Ubicacion || actividad.ubicacion}</Text>
+          <Text style={styles.detalle}>Precio: ${actividad.Precio || actividad.precio}</Text>
+          <Text style={styles.detalle}>Fecha: {actividad.Fecha_Actividad || actividad.fecha}</Text>
+        </View>
+      </TouchableOpacity>
+      <View style={styles.actions}>
+        <Pressable onPress={onEdit} style={[styles.button, styles.editBtn]}>
+          <Ionicons name="create" size={16} color="#fff" />
+        </Pressable>
+        <Pressable onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
+          <Ionicons name="trash" size={16} color="#fff" />
+        </Pressable>
       </View>
-
-      <View style={styles.info}>
-        <Text style={styles.nombre}>{actividad.nombre}</Text>
-
-        <View style={styles.row}>
-          <Ionicons name="information-circle-outline" size={16} color="#555" />
-          <Text style={styles.detalle}> {actividad.descripcion}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Ionicons name="location-outline" size={16} color="#555" />
-          <Text style={styles.detalle}> {actividad.ubicacion}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Ionicons name="pricetag-outline" size={16} color="#555" />
-          <Text style={styles.detalle}> ${actividad.precio}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Ionicons name="calendar-outline" size={16} color="#555" />
-          <Text style={styles.detalle}> {actividad.fecha}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Ionicons name="albums-outline" size={16} color="#555" />
-          <Text style={styles.detalle}> Categoría ID: {actividad.idCategoria}</Text>
-        </View>
-      </View>
-
-      {/* {(userRole === 'administrador') && ( */}
-        <View style={styles.actions}>
-          <Pressable onPress={onEdit} style={({ pressed }) => [styles.button, styles.editBtn, pressed && styles.pressed]}>
-            <Ionicons name="create-outline" size={18} color="#fff" />
-          </Pressable>
-          <Pressable onPress={onDelete} style={({ pressed }) => [styles.button, styles.deleteBtn, pressed && styles.pressed]}>
-            <Ionicons name="trash-outline" size={18} color="#fff" />
-          </Pressable>
-        </View>
-      {/* )} */}
-    </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    backgroundColor: "#f9fbff",
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 12,
     marginVertical: 8,
     marginHorizontal: 16,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    overflow: "hidden",
+  },
+  cardContent: {
+    padding: 15,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "#0a74da",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#007bff",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 15,
   },
-  avatarText: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
+  avatarText: { color: "#fff", fontSize: 20, fontWeight: "bold" },
+  nameContainer: { flex: 1 },
+  nombre: { fontSize: 18, fontWeight: "bold", color: "#333" },
+  details: {
+    marginBottom: 10,
   },
-  info: { flex: 1 },
-  nombre: { fontSize: 17, fontWeight: "bold", marginBottom: 6, color: "#222" },
-  row: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
-  detalle: { fontSize: 14, color: "#444", marginLeft: 4 },
-  actions: { flexDirection: "column", marginLeft: 8 },
+  detalle: { fontSize: 14, color: "#666", marginBottom: 3 },
+  actions: {
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingVertical: 10,
+    backgroundColor: "#f0f0f0",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+  },
   button: {
-    padding: 8,
-    borderRadius: 8,
-    marginVertical: 4,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    elevation: 2,
+    marginHorizontal: 5,
   },
-  editBtn: { backgroundColor: "#0a18d6" },
-  deleteBtn: { backgroundColor: "#f20c0c" },
-  pressed: { opacity: 0.7, transform: [{ scale: 0.95 }] },
+  editBtn: { backgroundColor: "#007bff" },
+  deleteBtn: { backgroundColor: "#dc3545" },
 });

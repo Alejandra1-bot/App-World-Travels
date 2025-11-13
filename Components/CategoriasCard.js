@@ -1,11 +1,11 @@
 import { View, Text, Pressable, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function CategoriaCard({ categoria, onEdit, onDelete, userRole }) {
+export default function CategoriaCard({ categoria, onEdit, onDelete, userRole, onPress }) {
   const inicial = categoria.Nombre_Categoria ? categoria.Nombre_Categoria.charAt(0).toUpperCase() : "?";
 
   return (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={onPress}>
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>{inicial}</Text>
       </View>

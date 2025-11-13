@@ -1,12 +1,12 @@
 import api from "./Conexion";
 
-export const listarPacientes= async () => {
+export const listarEmpresas= async () => {
     try {
-    const response = await api.get("/listarPacientes");
+    const response = await api.get("/listarEmpresas");
     return {success: true, data: response.data};
 
     } catch (error) {
-        console.error("Error al listar pacientes:", error.response ? error.response.data : error.message);
+        console.error("Error al listar empresas:", error.response ? error.response.data : error.message);
         return {
             success: false,
             message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
@@ -14,12 +14,12 @@ export const listarPacientes= async () => {
     }
 }
  
-export const eliminarPaciente = async (id) => {
+export const eliminarEmpresas = async (id) => {
     try {
-        await api.delete(`/eliminarPacientes/${id}`);
+        await api.delete(`/eliminarEmpresas/${id}`);
         return {success: true };
     } catch (error) {
-        console.error("Error al eliminar el  pacientes:", error.response ? error.response.data : error.message);
+        console.error("Error al eliminar la empresa:", error.response ? error.response.data : error.message);
         return {
         success: false,
         message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
@@ -27,24 +27,24 @@ export const eliminarPaciente = async (id) => {
     }
 }
 
-export const crearPaciente = async (data) => {
+export const crearEmpresas = async (data) => {
     try {
-        const response = await api.post("/CrearPacientes", data );
+        const response = await api.post("/crearEmpresas", data );
         return { success: true, data: response.data };
     } catch (error) {
-        // console.error("Error al crear el paciente:", error.response ? error.response.data : error.message);
+        // console.error("Error al crear la empresa:", error.response ? error.response.data : error.message);
         return {
             success: false,
             message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",
         };
     }
 };
-export const editarPaciente = async (id, data) => {
+export const actualizarEmpresas = async (id, data) => {
     try {
-        const response = await api.put(`/actualizarPacientes/${id}`, data);
+        const response = await api.put(`/actualizarEmpresas/${id}`, data);
         return { success: true, data: response.data };
     } catch (error) {
-        // console.error("Error al editar el paciente:", error.response ? error.response.data : error.message);
+        // console.error("Error al editar la empresa:", error.response ? error.response.data : error.message);
         return {
             success: false,
             message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",

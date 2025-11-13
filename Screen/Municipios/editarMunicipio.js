@@ -43,11 +43,12 @@ export default function EditarMunicipio() {
       let result;
       if (esEdicion) {
         result = await actualizarMunicipios(municipio.id, {
-          Nombre_Municipio,
+          Nombre_Municipio: Nombre_Municipio,
         });
       } else {
         result = await crearMunicipios({
-          Nombre_Municipio,
+          Nombre_Municipio: Nombre_Municipio,
+          idDepartamento: null,
         });
       }
 

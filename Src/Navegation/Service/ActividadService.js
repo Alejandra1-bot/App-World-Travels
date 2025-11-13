@@ -1,4 +1,5 @@
 import api from "./Conexion";
+import axios from 'axios';
 
 export const listarActividades= async () => {
     try {
@@ -29,7 +30,8 @@ export const eliminarActividades = async (id) => {
 
 export const crearActividades = async (data) => {
     try {
-        const response = await api.post("/crearActividades", data );
+        const config = data instanceof FormData ? {} : { headers: { 'Content-Type': 'application/json' } };
+        const response = await api.post("/crearActividades", data, config);
         return { success: true, data: response.data };
     } catch (error) {
         console.error("Error al crear la Actividad:", error.response ? error.response.data : error.message);

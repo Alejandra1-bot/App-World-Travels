@@ -106,12 +106,12 @@ export default function ListarMunicipios() {
             municipio={item}
             onEdit={() => handleEditar(item)}
             onDelete={() => handleEliminar(item.id)}
-            userRole={userRole}
-            onPress={() =>
-              navigation.navigate("DetalleMunicipio", {
+            onViewDetails={() =>
+              navigation.navigate("detalleMunicipio", {
                 municipio: item,
               })
             }
+            userRole={userRole}
           />
         )}
         ListEmptyComponent={

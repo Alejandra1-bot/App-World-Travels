@@ -15,12 +15,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import {
-  crearReservas,
-  actualizarReservas,
-  listarUsuarios,
-  listarActividades,
-} from "../../Src/Navegation/Service/ReservasService";
+import { crearReservas, actualizarReservas } from "../../Src/Navegation/Service/ReservasService";
+import { listarUsuarios } from "../../Src/Navegation/Service/UsuariosService";
+import { listarActividades } from "../../Src/Navegation/Service/ActividadService";
 
 import { useAppContext } from "../Configuracion/AppContext";
 
@@ -54,12 +51,15 @@ export default function EditarReserva() {
     const fetchData = async () => {
       try {
         const resUsuarios = await listarUsuarios();
-        const resActividades = await listarActividades();
-
         if (resUsuarios.success) setUsuarios(resUsuarios.data);
+      } catch (error) {
+        console.error("Error cargando usuarios:", error);
+      }
+      try {
+        const resActividades = await listarActividades();
         if (resActividades.success) setActividades(resActividades.data);
       } catch (error) {
-        Alert.alert("Error", "No se pudieron cargar los datos relacionados.");
+        console.error("Error cargando actividades:", error);
       }
     };
     fetchData();
@@ -155,7 +155,7 @@ export default function EditarReserva() {
               >
                 <Picker.Item label="Seleccionar Usuario" value="" />
                 {usuarios.map((u) => (
-                  <Picker.Item key={u.id} label={u.nombre} value={u.id} />
+                  <Picker.Item key={u.id} label={u.Nombre || u.nombre} value={u.id} />
                 ))}
               </Picker>
             </View>

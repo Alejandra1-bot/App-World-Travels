@@ -91,17 +91,21 @@ export default function ListarActividades() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Lista de Actividades</Text>
+      </View>
       <FlatList
         data={actividades}
         keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => (
           <ActividadCard
             actividad={item}
             onEdit={() => handleEditar(item)}
             onDelete={() => handleEliminar(item.id)}
             userRole={userRole}
-            onPress={() => navigation.navigate("DetalleActividad", {
+            onPress={() => navigation.navigate("detalleActividad", {
               actividad: item,
               categorias: categorias,
             })}
@@ -112,16 +116,57 @@ export default function ListarActividades() {
         }
       />
 
-      {/* {(userRole === 'administrador' || userRole === 'empresa') && ( */}
-        <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
-          <Text style={styles.textBotton}>+Nueva Actividad</Text>
-        </TouchableOpacity>
-      {/* )} */}
+      <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
+        <Text style={styles.floatingButtonText}>Nueva Actividad</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  floatingButton: {
+    position: "absolute",
+    bottom: 20,
+    left: '50%',
+    marginLeft: -90, // Ajustar según el ancho aproximado
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    backgroundColor: "#007bff",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  floatingButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  header: {
+    backgroundColor: "#e8f4fd",
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#333",
+    textAlign: "center",
+  },
+  listContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 10,
+  },
   centered: {
     flex: 1,
     justifyContent: "center",
@@ -129,20 +174,8 @@ const styles = StyleSheet.create({
   },
   empty: {
     textAlign: "center",
-    marginTop: 20,
+    marginTop: 50,
     fontSize: 16,
-    color: "#555",
-  },
-  botonCrear: {
-    backgroundColor: "#0a18d6ff",
-    padding: 16,
-    borderRadius: 30,
-    margin: 16,
-    alignItems: "center",
-  },
-  textBotton: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
+    color: "#999",
   },
 });

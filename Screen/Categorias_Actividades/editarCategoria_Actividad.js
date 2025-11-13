@@ -24,8 +24,8 @@ export default function EditarCategoria_Actividad() {
   const categoria = route.params?.categoria;
   const { colors } = useAppContext();
 
-  const [nombre, setNombre] = useState(categoria ? categoria.nombre || categoria.Nombre : "");
-  const [descripcion, setDescripcion] = useState(categoria ? categoria.descripcion || categoria.Descripcion : "");
+  const [nombre, setNombre] = useState(categoria ? categoria.Nombre_Categoria || categoria.nombre || categoria.Nombre : "");
+  const [descripcion, setDescripcion] = useState(categoria ? categoria.Descripcion || categoria.descripcion : "");
   const [loading, setLoading] = useState(false);
 
   const esEdicion = !!categoria;

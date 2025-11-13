@@ -99,7 +99,7 @@ export default function ListarCategoria_Actividad() {
             onDelete={() => handleEliminar(item.id)}
             userRole={userRole}
             onPress={() =>
-              navigation.navigate("DetalleCategoria_Actividad", {
+              navigation.navigate("detalleCategoria_Actividad", {
                 categoria: item,
               })
             }
