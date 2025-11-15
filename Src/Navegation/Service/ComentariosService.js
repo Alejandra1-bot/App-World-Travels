@@ -11,7 +11,7 @@ export const listarComentarios= async () => {
             success: false,
             message: error.response ? error.response.data : "Error de conexion ",
         };
-    }  
+    }
 }
  
 export const eliminarComentarios = async (id) => {

@@ -1,9 +1,41 @@
 import api from "./Conexion";
+import { listarActividades } from "./ActividadService";
+import { listarUsuarios } from "./UsuariosService";
 
 export const listarReservas= async () => {
     try {
     const response = await api.get("/listarReservas");
-    return {success: true, data: response.data};
+    const reservas = response.data;
+
+    // Fetch actividades and usuarios to map names
+    const [actividadesRes, usuariosRes] = await Promise.all([
+        listarActividades(),
+        listarUsuarios()
+    ]);
+
+    if (actividadesRes.success && usuariosRes.success) {
+        const actividadesMap = actividadesRes.data.reduce((map, act) => {
+            map[act.id] = act.Nombre_Actividad || act.nombre_actividad;
+            return map;
+        }, {});
+
+        const usuariosMap = usuariosRes.data.reduce((map, user) => {
+            map[user.id] = user.Nombre || user.nombre;
+            return map;
+        }, {});
+
+        // Add names to reservas
+        const reservasConNombres = reservas.map(reserva => ({
+            ...reserva,
+            nombreActividad: actividadesMap[reserva.idActividad] || "Actividad no encontrada",
+            nombreUsuario: usuariosMap[reserva.idUsuario] || "Usuario no encontrado"
+        }));
+
+        return {success: true, data: reservasConNombres};
+    } else {
+        // If fetching fails, return original data
+        return {success: true, data: reservas};
+    }
 
     } catch (error) {
         console.error("Error al listar las Reservas:", error.response ? error.response.data : error.message);

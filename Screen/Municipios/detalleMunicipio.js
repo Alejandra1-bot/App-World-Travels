@@ -19,23 +19,9 @@ export default function DetalleMunicipio() {
 
       {/* Información */}
       <View style={styles.infoBox}>
-        <Text style={styles.label}>🏙️ Código:</Text>
-        <Text style={styles.value}>{municipio.Codigo}</Text>
+        <Text style={styles.label}>🏙️ Nombre Municipio:</Text>
+        <Text style={styles.value}>{municipio.Nombre_Municipio}</Text>
 
-        <Text style={styles.label}>📍 Departamento:</Text>
-        <Text style={styles.value}>{municipio.Departamento}</Text>
-
-        <Text style={styles.label}>👥 Población:</Text>
-        <Text style={styles.value}>{municipio.Poblacion}</Text>
-
-        <Text style={styles.label}>📏 Superficie (km²):</Text>
-        <Text style={styles.value}>{municipio.Superficie}</Text>
-
-        <Text style={styles.label}>🗓️ Fecha de fundación:</Text>
-        <Text style={styles.value}>{municipio.FechaFundacion}</Text>
-
-        <Text style={styles.label}>📌 Descripción:</Text>
-        <Text style={styles.value}>{municipio.Descripcion}</Text>
       </View>
 
       {/* Botón volver */}

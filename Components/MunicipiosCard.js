@@ -15,17 +15,20 @@ export default function MunicipioCard({ municipio, onEdit, onDelete, onViewDetai
             <Text style={styles.nombre}>{municipio.Nombre_Municipio}</Text>
           </View>
         </View>
+        {/* <View style={styles.details}>
+          <Text style={styles.detalle}>ID: {municipio.id}</Text>
+        </View> */}
       </TouchableOpacity>
       <View style={styles.actions}>
-        <Pressable onPress={onViewDetails} style={[styles.button, styles.viewBtn]}>
+        {/* <TouchableOpacity onPress={onViewDetails} style={[styles.button, styles.viewBtn]}>
           <Ionicons name="eye" size={16} color="#fff" />
-        </Pressable>
-        <Pressable onPress={onEdit} style={[styles.button, styles.editBtn]}>
+        </TouchableOpacity> */}
+        <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
           <Ionicons name="create" size={16} color="#fff" />
-        </Pressable>
-        <Pressable onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
           <Ionicons name="trash" size={16} color="#fff" />
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -70,9 +73,8 @@ const styles = StyleSheet.create({
     borderTopColor: "#ddd",
   },
   button: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    padding: 10,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: 5,

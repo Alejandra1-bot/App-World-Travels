@@ -13,8 +13,8 @@ export default function DetalleCategoriaActividad() {
       {/* Encabezado */}
       <View style={styles.header}>
         <Ionicons name="pricetags-outline" size={80} color="#fff" />
-        <Text style={styles.headerTitle}>{categoria.NombreCategoria}</Text>
-        <Text style={styles.headerSub}>ID: {categoria.IdCategoria}</Text>
+        <Text style={styles.headerTitle}>{categoria.Nombre_Categoria}</Text>
+        {/* <Text style={styles.headerSub}>ID: {categoria.}</Text> */}
       </View>
 
       {/* Información */}
@@ -22,11 +22,10 @@ export default function DetalleCategoriaActividad() {
         <Text style={styles.label}>📝 Descripción:</Text>
         <Text style={styles.value}>{categoria.Descripcion}</Text>
 
-        <Text style={styles.label}>📅 Fecha de creación:</Text>
-        <Text style={styles.value}>{categoria.FechaCreacion}</Text>
+        
 
-        <Text style={styles.label}>🔄 Estado:</Text>
-        <Text style={styles.value}>{categoria.Estado ? "Activa" : "Inactiva"}</Text>
+        {/* <Text style={styles.label}>🔄 Estado:</Text>
+        <Text style={styles.value}>{categoria.Estado ? "Activa" : "Inactiva"}</Text> */}
       </View>
 
       {/* Botón volver */}

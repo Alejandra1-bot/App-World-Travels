@@ -9,10 +9,11 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Modal,
+  FlatList,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { crearReservas, actualizarReservas } from "../../Src/Navegation/Service/ReservasService";
@@ -29,7 +30,7 @@ export default function EditarReserva() {
   const { colors, texts, userRole } = useAppContext();
 
   const [fecha_Reserva, setFechaReserva] = useState(
-    reserva ? reserva.fecha_Reserva || "" : ""
+    reserva ? reserva.Fecha_Reserva || "" : ""
   );
   const [Numero_Personas, setNumeroPersonas] = useState(
     reserva ? String(reserva.Numero_Personas) : ""
@@ -43,6 +44,8 @@ export default function EditarReserva() {
   const [usuarios, setUsuarios] = useState([]);
   const [actividades, setActividades] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState('');
 
   const esEdicion = !!reserva;
 
@@ -76,7 +79,7 @@ export default function EditarReserva() {
     try {
       let result;
       const data = {
-        fecha_Reserva,
+        Fecha_Reserva: fecha_Reserva,
         Numero_Personas: parseInt(Numero_Personas),
         Estado,
         idUsuario,
@@ -135,47 +138,47 @@ export default function EditarReserva() {
 
             <View style={styles.pickerContainer}>
               <Text style={styles.label}>Estado</Text>
-              <Picker
-                selectedValue={Estado}
-                onValueChange={(v) => setEstado(v)}
-                style={styles.picker}
+              <TouchableOpacity
+                style={styles.pickerTouchable}
+                onPress={() => {
+                  setModalType('estado');
+                  setModalVisible(true);
+                }}
               >
-                <Picker.Item label="Pendiente" value="pendiente" />
-                <Picker.Item label="Confirmada" value="confirmada" />
-                <Picker.Item label="Cancelada" value="cancelada" />
-              </Picker>
+                <Text style={styles.pickerText}>
+                  {Estado === 'pendiente' ? 'Pendiente' : Estado === 'confirmada' ? 'Confirmada' : 'Cancelada'}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.pickerContainer}>
               <Text style={styles.label}>Usuario</Text>
-              <Picker
-                selectedValue={idUsuario}
-                onValueChange={(v) => setIdUsuario(v)}
-                style={styles.picker}
+              <TouchableOpacity
+                style={styles.pickerTouchable}
+                onPress={() => {
+                  setModalType('usuario');
+                  setModalVisible(true);
+                }}
               >
-                <Picker.Item label="Seleccionar Usuario" value="" />
-                {usuarios.map((u) => (
-                  <Picker.Item key={u.id} label={u.Nombre || u.nombre} value={u.id} />
-                ))}
-              </Picker>
+                <Text style={styles.pickerText}>
+                  {idUsuario ? usuarios.find(u => u.id === idUsuario)?.Nombre || 'Usuario seleccionado' : 'Seleccionar Usuario'}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.pickerContainer}>
               <Text style={styles.label}>Actividad</Text>
-              <Picker
-                selectedValue={idActividad}
-                onValueChange={(v) => setIdActividad(v)}
-                style={styles.picker}
+              <TouchableOpacity
+                style={styles.pickerTouchable}
+                onPress={() => {
+                  setModalType('actividad');
+                  setModalVisible(true);
+                }}
               >
-                <Picker.Item label="Seleccionar Actividad" value="" />
-                {actividades.map((a) => (
-                  <Picker.Item
-                    key={a.id}
-                    label={a.Nombre_Actividad || a.nombre_actividad}
-                    value={a.id}
-                  />
-                ))}
-              </Picker>
+                <Text style={styles.pickerText}>
+                  {idActividad ? actividades.find(a => a.id === idActividad)?.Nombre_Actividad || 'Actividad seleccionada' : 'Seleccionar Actividad'}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <TouchableOpacity
@@ -191,6 +194,44 @@ export default function EditarReserva() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <Modal visible={modalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
+        <SafeAreaView style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>
+            Seleccionar {modalType === 'usuario' ? 'Usuario' : modalType === 'actividad' ? 'Actividad' : 'Estado'}
+          </Text>
+          <FlatList
+            data={
+              modalType === 'usuario'
+                ? [{ id: '', label: 'Seleccionar Usuario' }, ...usuarios.map(u => ({ id: u.id, label: u.Nombre || u.nombre }))]
+                : modalType === 'actividad'
+                ? [{ id: '', label: 'Seleccionar Actividad' }, ...actividades.map(a => ({ id: a.id, label: a.Nombre_Actividad || a.nombre_actividad }))]
+                : [
+                    { id: 'pendiente', label: 'Pendiente' },
+                    { id: 'confirmada', label: 'Confirmada' },
+                    { id: 'cancelada', label: 'Cancelada' }
+                  ]
+            }
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.modalItem}
+                onPress={() => {
+                  if (modalType === 'usuario') setIdUsuario(item.id);
+                  else if (modalType === 'actividad') setIdActividad(item.id);
+                  else setEstado(item.id);
+                  setModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalItemText}>{item.label}</Text>
+              </TouchableOpacity>
+            )}
+          />
+          <TouchableOpacity style={styles.modalClose} onPress={() => setModalVisible(false)}>
+            <Text style={styles.modalCloseText}>Cerrar</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -215,11 +256,6 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 30,
     marginHorizontal: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 8,
   },
   input: {
     backgroundColor: "#f9f9f9",
@@ -237,11 +273,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     marginBottom: 15,
-    overflow: "hidden",
+    zIndex: 10,
   },
-  picker: {
+  pickerTouchable: {
     height: 50,
-    width: "100%",
+    justifyContent: "center",
+    paddingHorizontal: 10,
+  },
+  pickerText: {
+    fontSize: 16,
+    color: "#333",
   },
   label: {
     fontSize: 14,
@@ -283,5 +324,37 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 4,
     transform: [{ translateY: -2 }],
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: 50,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  modalItemText: {
+    fontSize: 16,
+  },
+  modalClose: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: "#007bff",
+    alignItems: "center",
+    marginHorizontal: 20,
+    borderRadius: 10,
+  },
+  modalCloseText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

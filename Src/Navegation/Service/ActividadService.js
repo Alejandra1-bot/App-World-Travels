@@ -15,14 +15,16 @@ export const listarActividades= async () => {
     }
 }
  
-export const eliminarActividades = async (id) => {
+export const eliminarActividad = async (id) => {
     try {
+        console.log('Sending delete request for', id);
         await api.delete(`/eliminarActividades/${id}`);
+        console.log('Delete request successful for', id);
         return {success: true };
     } catch (error) {
         console.error("Error al eliminar la Actividad", error.response ? error.response.data : error.message);
         return {
-        success: false, 
+        success: false,
         message: error.response ? error.response.data : "Error de conexion ",
         };
     }

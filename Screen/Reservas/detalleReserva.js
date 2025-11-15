@@ -21,7 +21,7 @@ export default function DetalleReserva() {
       {/* Información */}
       <View style={styles.infoBox}>
         <Text style={styles.label}>📅 Fecha:</Text>
-        <Text style={styles.value}>{reserva.fecha_Reserva}</Text>
+        <Text style={styles.value}>{reserva.Fecha_Reserva}</Text>
 
         <Text style={styles.label}>👥 Número de Personas:</Text>
         <Text style={styles.value}>{reserva.Numero_Personas}</Text>
@@ -29,11 +29,11 @@ export default function DetalleReserva() {
         <Text style={styles.label}>📌 Estado:</Text>
         <Text style={styles.value}>{reserva.Estado}</Text>
 
-        <Text style={styles.label}>🧑‍💼 ID Usuario:</Text>
-        <Text style={styles.value}>{reserva.idUsuario}</Text>
+        <Text style={styles.label}>🧑‍💼 Usuario:</Text>
+        <Text style={styles.value}>{reserva.nombreUsuario}</Text>
 
-        <Text style={styles.label}>🎯 ID Actividad:</Text>
-        <Text style={styles.value}>{reserva.idActividad}</Text>
+        <Text style={styles.label}>🎯 Actividad:</Text>
+        <Text style={styles.value}>{reserva.nombreActividad}</Text>
       </View>
 
       {/* Botón volver */}

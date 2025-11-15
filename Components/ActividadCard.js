@@ -29,12 +29,12 @@ export default function ActividadCard({ actividad, onEdit, onDelete, userRole, o
         </View>
       </TouchableOpacity>
       <View style={styles.actions}>
-        <Pressable onPress={onEdit} style={[styles.button, styles.editBtn]}>
+        <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
           <Ionicons name="create" size={16} color="#fff" />
-        </Pressable>
-        <Pressable onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
           <Ionicons name="trash" size={16} color="#fff" />
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -83,9 +83,8 @@ const styles = StyleSheet.create({
     borderTopColor: "#ddd",
   },
   button: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    padding: 10,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: 5,

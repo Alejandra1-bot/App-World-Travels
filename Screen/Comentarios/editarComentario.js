@@ -9,18 +9,16 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Modal,
+  FlatList,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import {
-  crearComentarios,
-  actualizarComentarios,
-  listarUsuarios,
-  listarActividades,
-} from "../../Src/Navegation/Service/ComentariosService";
+import { crearComentarios, actualizarComentarios } from "../../Src/Navegation/Service/ComentariosService";
+import { listarUsuarios } from "../../Src/Navegation/Service/UsuariosService";
+import { listarActividades } from "../../Src/Navegation/Service/ActividadService";
 
 import { useAppContext } from "../Configuracion/AppContext";
 
@@ -32,7 +30,7 @@ export default function EditarComentario() {
   const { colors, texts, userRole } = useAppContext();
 
   const [Contenido, setContenido] = useState(comentario ? comentario.Contenido || "" : "");
-  const [Calificacion, setCalificacion] = useState(comentario ? String(comentario.Calificacion) : "");
+  const [Calificacion, setCalificacion] = useState(comentario ? comentario.Calificacion || 0 : 0);
   const [Fecha_Comentario, setFechaComentario] = useState(comentario ? comentario.Fecha_Comentario || "" : "");
   const [idUsuario, setIdUsuario] = useState(comentario ? comentario.idUsuario : "");
   const [idActividad, setIdActividad] = useState(comentario ? comentario.idActividad : "");
@@ -40,6 +38,8 @@ export default function EditarComentario() {
   const [usuarios, setUsuarios] = useState([]);
   const [actividades, setActividades] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState('');
 
   const esEdicion = !!comentario;
 
@@ -121,13 +121,30 @@ export default function EditarComentario() {
               onChangeText={setContenido}
             />
 
-            <TextInput
-              style={styles.input}
-              placeholder="Calificación (1-5)"
-              keyboardType="numeric"
-              value={Calificacion}
-              onChangeText={setCalificacion}
-            />
+             
+              <View style={styles.starsContainer}>
+                <Text style={styles.label}>Calificación:</Text>
+                <View style={styles.stars}>
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <TouchableOpacity key={i} onPress={() => setCalificacion(i + 1)}>
+                      <Ionicons
+                        name={i < Calificacion ? "star" : "star-outline"}
+                        size={30}
+                        color="#FFD700"
+                      />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            
+              {/* <TextInput
+                style={styles.input}
+                placeholder="Calificación (1-5)"
+                keyboardType="numeric"
+                value={String(Calificacion)}
+                onChangeText={(text) => setCalificacion(parseInt(text) || 0)}
+              /> */}
+            
 
             <TextInput
               style={styles.input}
@@ -138,34 +155,32 @@ export default function EditarComentario() {
 
             <View style={styles.pickerContainer}>
               <Text style={styles.label}>Usuario</Text>
-              <Picker
-                selectedValue={idUsuario}
-                onValueChange={(v) => setIdUsuario(v)}
-                style={styles.picker}
+              <TouchableOpacity
+                style={styles.pickerTouchable}
+                onPress={() => {
+                  setModalType('usuario');
+                  setModalVisible(true);
+                }}
               >
-                <Picker.Item label="Seleccionar Usuario" value="" />
-                {usuarios.map((u) => (
-                  <Picker.Item key={u.id} label={u.nombre} value={u.id} />
-                ))}
-              </Picker>
+                <Text style={styles.pickerText}>
+                  {idUsuario ? usuarios.find(u => u.id === idUsuario)?.Nombre || 'Usuario seleccionado' : 'Seleccionar Usuario'}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.pickerContainer}>
               <Text style={styles.label}>Actividad</Text>
-              <Picker
-                selectedValue={idActividad}
-                onValueChange={(v) => setIdActividad(v)}
-                style={styles.picker}
+              <TouchableOpacity
+                style={styles.pickerTouchable}
+                onPress={() => {
+                  setModalType('actividad');
+                  setModalVisible(true);
+                }}
               >
-                <Picker.Item label="Seleccionar Actividad" value="" />
-                {actividades.map((a) => (
-                  <Picker.Item
-                    key={a.id}
-                    label={a.Nombre_Actividad || a.nombre_actividad}
-                    value={a.id}
-                  />
-                ))}
-              </Picker>
+                <Text style={styles.pickerText}>
+                  {idActividad ? actividades.find(a => a.id === idActividad)?.Nombre_Actividad || 'Actividad seleccionada' : 'Seleccionar Actividad'}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <TouchableOpacity
@@ -181,6 +196,37 @@ export default function EditarComentario() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <Modal visible={modalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
+        <SafeAreaView style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>
+            Seleccionar {modalType === 'usuario' ? 'Usuario' : 'Actividad'}
+          </Text>
+          <FlatList
+            data={
+              modalType === 'usuario'
+                ? [{ id: '', label: 'Seleccionar Usuario' }, ...usuarios.map(u => ({ id: u.id, label: u.Nombre || u.nombre }))]
+                : [{ id: '', label: 'Seleccionar Actividad' }, ...actividades.map(a => ({ id: a.id, label: a.Nombre_Actividad || a.nombre_actividad }))]
+            }
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.modalItem}
+                onPress={() => {
+                  if (modalType === 'usuario') setIdUsuario(item.id);
+                  else setIdActividad(item.id);
+                  setModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalItemText}>{item.label}</Text>
+              </TouchableOpacity>
+            )}
+          />
+          <TouchableOpacity style={styles.modalClose} onPress={() => setModalVisible(false)}>
+            <Text style={styles.modalCloseText}>Cerrar</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -273,5 +319,46 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 4,
     transform: [{ translateY: -2 }],
+  },
+  pickerTouchable: {
+    height: 50,
+    justifyContent: "center",
+    paddingHorizontal: 10,
+  },
+  pickerText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: 50,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  modalItemText: {
+    fontSize: 16,
+  },
+  modalClose: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: "#007bff",
+    alignItems: "center",
+    marginHorizontal: 20,
+    borderRadius: 10,
+  },
+  modalCloseText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

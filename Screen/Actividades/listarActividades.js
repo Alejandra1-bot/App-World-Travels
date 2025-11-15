@@ -57,6 +57,7 @@ export default function ListarActividades() {
   };
 
   const handleEliminar = (id) => {
+    console.log('Handle eliminar called', id);
     Alert.alert(
       "Confirmar Eliminación",
       "¿Estás seguro de eliminar esta actividad?",
@@ -103,7 +104,7 @@ export default function ListarActividades() {
           <ActividadCard
             actividad={item}
             onEdit={() => handleEditar(item)}
-            onDelete={() => handleEliminar(item.id)}
+            onDelete={() => { console.log('Delete pressed', item.id); handleEliminar(item.id); }}
             userRole={userRole}
             onPress={() => navigation.navigate("detalleActividad", {
               actividad: item,
