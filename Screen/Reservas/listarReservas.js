@@ -107,7 +107,7 @@ export default function ListarReservas() {
             onDelete={() => handleEliminar(item.id)}
             userRole={userRole}
             onPress={() =>
-              navigation.navigate("DetalleReserva", {
+              navigation.navigate("detalleReserva", {
                 reserva: item,
               })
             }

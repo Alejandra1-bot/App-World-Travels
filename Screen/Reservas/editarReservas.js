@@ -28,13 +28,13 @@ export default function EditarReserva() {
   const reserva = route.params?.reserva;
   const { colors, texts, userRole } = useAppContext();
 
-  const [Fecha_Reserva, setFechaReserva] = useState(
-    reserva ? reserva.Fecha_Reserva || "" : ""
+  const [fecha_Reserva, setFechaReserva] = useState(
+    reserva ? reserva.fecha_Reserva || "" : ""
   );
   const [Numero_Personas, setNumeroPersonas] = useState(
     reserva ? String(reserva.Numero_Personas) : ""
   );
-  const [Estado, setEstado] = useState(reserva ? reserva.Estado : "Pendiente");
+  const [Estado, setEstado] = useState(reserva ? (reserva.Estado ? reserva.Estado.toLowerCase() : "pendiente") : "pendiente");
   const [idUsuario, setIdUsuario] = useState(reserva ? reserva.idUsuario : "");
   const [idActividad, setIdActividad] = useState(
     reserva ? reserva.idActividad : ""
@@ -67,7 +67,7 @@ export default function EditarReserva() {
 
   // Guardar o actualizar
   const handleGuardar = async () => {
-    if (!Fecha_Reserva || !Numero_Personas || !idUsuario || !idActividad) {
+    if (!fecha_Reserva || !Numero_Personas || !idUsuario || !idActividad) {
       Alert.alert("Error", "Por favor, completa todos los campos requeridos.");
       return;
     }
@@ -76,7 +76,7 @@ export default function EditarReserva() {
     try {
       let result;
       const data = {
-        Fecha_Reserva,
+        fecha_Reserva,
         Numero_Personas: parseInt(Numero_Personas),
         Estado,
         idUsuario,
@@ -121,7 +121,7 @@ export default function EditarReserva() {
             <TextInput
               style={styles.input}
               placeholder="Fecha de la Reserva (YYYY-MM-DD)"
-              value={Fecha_Reserva}
+              value={fecha_Reserva}
               onChangeText={setFechaReserva}
             />
 
@@ -140,9 +140,9 @@ export default function EditarReserva() {
                 onValueChange={(v) => setEstado(v)}
                 style={styles.picker}
               >
-                <Picker.Item label="Pendiente" value="Pendiente" />
-                <Picker.Item label="Confirmada" value="Confirmada" />
-                <Picker.Item label="Cancelada" value="Cancelada" />
+                <Picker.Item label="Pendiente" value="pendiente" />
+                <Picker.Item label="Confirmada" value="confirmada" />
+                <Picker.Item label="Cancelada" value="cancelada" />
               </Picker>
             </View>
 

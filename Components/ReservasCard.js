@@ -1,11 +1,11 @@
 import { View, Text, Pressable, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function ReservaCard({ reserva, onEdit, onDelete, userRole }) {
+export default function ReservaCard({ reserva, onEdit, onDelete, userRole, onPress }) {
   const inicial = reserva.nombreUsuario ? reserva.nombreUsuario.charAt(0).toUpperCase() : "?";
 
   return (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={onPress}>
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>{inicial}</Text>
       </View>
@@ -20,7 +20,7 @@ export default function ReservaCard({ reserva, onEdit, onDelete, userRole }) {
 
         <View style={styles.row}>
           <Ionicons name="calendar-outline" size={16} color="#555" />
-          <Text style={styles.detalle}> {reserva.fecha}</Text>
+          <Text style={styles.detalle}> {reserva.fecha_Reserva}</Text>
         </View>
 
         <View style={styles.row}>
