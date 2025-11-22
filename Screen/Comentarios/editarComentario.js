@@ -30,7 +30,7 @@ export default function EditarComentario() {
   const { colors, texts, userRole } = useAppContext();
 
   const [Contenido, setContenido] = useState(comentario ? comentario.Contenido || "" : "");
-  const [Calificacion, setCalificacion] = useState(comentario ? comentario.Calificacion || 0 : 0);
+  const [Calificacion, setCalificacion] = useState(comentario ? comentario.Calificacion || 1 : 1);
   const [Fecha_Comentario, setFechaComentario] = useState(comentario ? comentario.Fecha_Comentario || "" : "");
   const [idUsuario, setIdUsuario] = useState(comentario ? comentario.idUsuario : "");
   const [idActividad, setIdActividad] = useState(comentario ? comentario.idActividad : "");
@@ -61,8 +61,24 @@ export default function EditarComentario() {
 
   // Guardar o actualizar
   const handleGuardar = async () => {
-    if (!Contenido || !Calificacion || !Fecha_Comentario || !idUsuario || !idActividad) {
-      Alert.alert("Error", "Por favor, completa todos los campos requeridos.");
+    if (!Contenido) {
+      Alert.alert("Error", "Por favor, ingresa el contenido del comentario.");
+      return;
+    }
+    if (!Calificacion || Calificacion < 1) {
+      Alert.alert("Error", "Por favor, selecciona una calificación.");
+      return;
+    }
+    if (!Fecha_Comentario) {
+      Alert.alert("Error", "Por favor, ingresa la fecha del comentario.");
+      return;
+    }
+    if (!idUsuario) {
+      Alert.alert("Error", "Por favor, selecciona un usuario.");
+      return;
+    }
+    if (!idActividad) {
+      Alert.alert("Error", "Por favor, selecciona una actividad.");
       return;
     }
 
@@ -360,5 +376,14 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  stars: {
+    flexDirection: 'row',
+    marginLeft: 10,
   },
 });

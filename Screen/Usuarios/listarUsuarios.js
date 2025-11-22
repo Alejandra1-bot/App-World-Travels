@@ -115,7 +115,7 @@ export default function ListarUsuarios() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Lista de Usuarios</Text>
+        <Text style={styles.headerTitle}>Gestión de Usuarios</Text>
       </View>
       <FlatList
         data={usuarios}
@@ -136,11 +136,11 @@ export default function ListarUsuarios() {
         }
       />
 
-      {/* {(userRole === 'administrador') && ( */}
+      {(userRole === 'administrador' || userRole === 'empresa') && (
         <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
           <Text style={styles.floatingButtonText}>Nuevo Usuario</Text>
         </TouchableOpacity>
-      {/* )} */}
+      )}
     </View>
   );
 }

@@ -32,7 +32,7 @@ export const crearEmpresas = async (data) => {
         const response = await api.post("/crearEmpresas", data );
         return { success: true, data: response.data };
     } catch (error) {
-        // console.error("Error al crear la empresa:", error.response ? error.response.data : error.message);
+        console.error("Error al crear la empresa:", error.response ? error.response.data : error.message);
         return {
             success: false,
             message: error.response ? (error.response.data.message || "Error desconocido") : "Error de conexion ",

@@ -14,6 +14,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { crearEmpresas, actualizarEmpresas } from "../../Src/Navegation/Service/EmpresaService";
 import { useAppContext } from "../Configuracion/AppContext";
 
 export default function EditarEmpresa() {
@@ -23,18 +24,19 @@ export default function EditarEmpresa() {
   const empresa = route.params?.empresa;
   const { colors, texts } = useAppContext();
 
-  const [Nombre_Empresa, setNombreEmpresa] = useState(empresa ? empresa.Nombre_Empresa || empresa.nombre_empresa : "");
-  const [Email, setCorreo] = useState(empresa ? empresa.Email || empresa.email : "");
-  const [Telefono, setTelefono] = useState(empresa ? empresa.Telefono || empresa.telefono : "");
-  const [Direccion, setDireccion] = useState(empresa ? empresa.Direccion || empresa.direccion : "");
-  const [NIT, setNit] = useState(empresa ? empresa.NIT || empresa.nit : "");
+  const [Nombre_Empresa, setNombreEmpresa] = useState(empresa ? empresa.nombre || "" : "");
+  const [Email, setCorreo] = useState(empresa ? empresa.email || "" : "");
+  const [Telefono, setTelefono] = useState(empresa ? empresa.telefono || "" : "");
+  const [Direccion, setDireccion] = useState(empresa ? empresa.direccion || "" : "");
+  const [NIT, setNit] = useState(empresa ? empresa.nit || "" : "");
+  const [Ciudad, setCiudad] = useState(empresa ? empresa.ciudad || "" : "");
   const [Contrasena, setContrasena] = useState("");
   const [loading, setLoading] = useState(false);
 
   const esEdicion = !!empresa;
 
   const handleGuardar = async () => {
-    const camposRequeridos = [Nombre_Empresa, Email, Telefono, Direccion, NIT];
+    const camposRequeridos = [Nombre_Empresa, Email, Telefono, Direccion, NIT, Ciudad];
     if (!esEdicion) camposRequeridos.push(Contrasena);
 
     if (camposRequeridos.some((campo) => !campo || campo === "")) {
@@ -46,21 +48,17 @@ export default function EditarEmpresa() {
     try {
       let result;
       if (esEdicion) {
-        // TODO: implement actualizarEmpresa
-        // result = await actualizarEmpresa(empresa.id, { Nombre_Empresa, Email, Telefono, Direccion, NIT });
-        Alert.alert("Info", "Función de actualización no implementada aún");
+        result = await actualizarEmpresas(empresa.id, { nombre: Nombre_Empresa, email: Email, telefono: Telefono, direccion: Direccion, nit: NIT, ciudad: Ciudad });
       } else {
-        // TODO: implement crearEmpresa
-        // result = await crearEmpresa({ Nombre_Empresa, Email, Telefono, Direccion, NIT, Contrasena });
-        Alert.alert("Info", "Función de creación no implementada aún");
+        result = await crearEmpresas({ nombre: Nombre_Empresa, email: Email, telefono: Telefono, direccion: Direccion, nit: NIT, contraseña: Contrasena, ciudad: Ciudad });
       }
 
-      // if (result.success) {
-      //   Alert.alert("Éxito", esEdicion ? "Empresa actualizada" : "Empresa creada correctamente");
-      //   navigation.goBack();
-      // } else {
-      //   Alert.alert("Error", result.message || "No se pudo guardar la empresa");
-      // }
+      if (result.success) {
+        Alert.alert("Éxito", esEdicion ? "Empresa actualizada" : "Empresa creada correctamente");
+        navigation.goBack();
+      } else {
+        Alert.alert("Error", result.message || "No se pudo guardar la empresa");
+      }
     } catch (error) {
       Alert.alert("Error", "No se pudo guardar la empresa");
     } finally {
@@ -110,6 +108,12 @@ export default function EditarEmpresa() {
               placeholder="NIT"
               value={NIT}
               onChangeText={setNit}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Ciudad"
+              value={Ciudad}
+              onChangeText={setCiudad}
             />
 
             {!esEdicion && (

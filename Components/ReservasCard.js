@@ -2,7 +2,7 @@ import { View, Text, Pressable, StyleSheet, TouchableOpacity } from "react-nativ
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-export default function ReservaCard({ reserva, onEdit, onDelete, userRole, onPress }) {
+export default function ReservaCard({ reserva, onCancel, userRole, onPress }) {
   const navigation = useNavigation();
   const inicial = reserva.nombreUsuario ? reserva.nombreUsuario.charAt(0).toUpperCase() : "?";
 
@@ -21,15 +21,12 @@ export default function ReservaCard({ reserva, onEdit, onDelete, userRole, onPre
           <Text style={styles.detalle}>Usuario: {reserva.nombreUsuario}</Text>
           <Text style={styles.detalle}>Fecha: {reserva.Fecha_Reserva}</Text>
           <Text style={styles.detalle}>Actividad: {reserva.nombreActividad}</Text>
-          <Text style={styles.detalle}>Estado: {reserva.Estado}</Text>
+          <Text style={styles.detalle}>Estado: {reserva.Estado === 'Cancelada' ? 'Cancelada por el usuario' : reserva.Estado}</Text>
         </View>
       </TouchableOpacity>
       <View style={styles.actions}>
-        <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
-          <Ionicons name="create" size={16} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
-          <Ionicons name="trash" size={16} color="#fff" />
+        <TouchableOpacity onPress={onCancel} style={[styles.button, styles.cancelBtn]}>
+          <Ionicons name="close-circle" size={16} color="#fff" />
         </TouchableOpacity>
       </View>
     </View>
@@ -85,7 +82,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginHorizontal: 5,
   },
-  editBtn: { backgroundColor: "#007bff" },
-  deleteBtn: { backgroundColor: "#dc3545" },
+  cancelBtn: { backgroundColor: "#ff6b35" },
 });
 

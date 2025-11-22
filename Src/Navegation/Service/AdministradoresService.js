@@ -15,7 +15,7 @@ export const listarAdministradores = async () => {
 
 export const crearAdministrador = async (data) => {
   try {
-    const response = await api.post("/crearAdministrador", data);
+    const response = await api.post("/crearAdministradores", data);
     return { success: true, data: response.data };
   } catch (error) {
     console.error("Error al crear administrador:", error.response ? error.response.data : error.message);
@@ -28,7 +28,7 @@ export const crearAdministrador = async (data) => {
 
 export const actualizarAdministrador = async (id, data) => {
   try {
-    const response = await api.put(`/actualizarAdministrador/${id}`, data);
+    const response = await api.put(`/actualizarAdministradores/${id}`, data);
     return { success: true, data: response.data };
   } catch (error) {
     console.error("Error al actualizar administrador:", error.response ? error.response.data : error.message);
@@ -41,7 +41,7 @@ export const actualizarAdministrador = async (id, data) => {
 
 export const eliminarAdministrador = async (id) => {
   try {
-    await api.delete(`/eliminarAdministrador/${id}`);
+    await api.delete(`/eliminarAdministradores/${id}`);
     return { success: true };
   } catch (error) {
     console.error("Error al eliminar administrador:", error.response ? error.response.data : error.message);

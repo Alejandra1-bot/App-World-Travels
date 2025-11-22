@@ -19,17 +19,19 @@ export default function MunicipioCard({ municipio, onEdit, onDelete, onViewDetai
           <Text style={styles.detalle}>ID: {municipio.id}</Text>
         </View> */}
       </TouchableOpacity>
-      <View style={styles.actions}>
-        {/* <TouchableOpacity onPress={onViewDetails} style={[styles.button, styles.viewBtn]}>
-          <Ionicons name="eye" size={16} color="#fff" />
-        </TouchableOpacity> */}
-        <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
-          <Ionicons name="create" size={16} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
-          <Ionicons name="trash" size={16} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      {(userRole === 'administrador' || userRole === 'empresa') && (
+        <View style={styles.actions}>
+          {/* <TouchableOpacity onPress={onViewDetails} style={[styles.button, styles.viewBtn]}>
+            <Ionicons name="eye" size={16} color="#fff" />
+          </TouchableOpacity> */}
+          <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
+            <Ionicons name="create" size={16} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
+            <Ionicons name="trash" size={16} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }

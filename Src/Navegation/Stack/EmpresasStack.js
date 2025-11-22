@@ -16,7 +16,7 @@ export default function EmpresasStack() {
       <Stack.Screen
         name="editarEmpresa"
         component={editarEmpresa}
-        options={{ title: 'Editar Empresa' }}
+        options={{ title: 'Gestion de Empresas' }}
       />
       <Stack.Screen
         name="detalleEmpresa"

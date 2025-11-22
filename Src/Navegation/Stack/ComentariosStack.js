@@ -21,7 +21,7 @@ export default function ComentariosStack() {
       <Stack.Screen
         name="editarComentario"
         component={editarComentario}
-        options={{ title: 'Editar Comentario' }}
+        options={{ title: 'Gestion de Comentarios' }}
       />
     </Stack.Navigator>
   );

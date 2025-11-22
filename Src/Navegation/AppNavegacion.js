@@ -8,7 +8,7 @@ export default function AppNavegacion(){
    const { isAuthenticated } = useAppContext();
 
     return(
-        <NavigationContainer>
+        <NavigationContainer key={isAuthenticated ? 'main' : 'auth'}>
            {isAuthenticated ? <NavegacionPrincipal/> : <AuthNavegation/>}
         </NavigationContainer>
     );

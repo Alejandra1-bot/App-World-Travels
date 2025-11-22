@@ -24,17 +24,19 @@ export default function UsuarioCard({ usuario, onEdit, onDelete, onBlock, userRo
           <Text style={styles.detalle}>Teléfono: {usuario.Telefono}</Text>
         </View>
       </TouchableOpacity>
-      <View style={styles.actions}>
-        <Pressable onPress={onEdit} style={[styles.button, styles.editBtn]}>
-          <Ionicons name="create" size={16} color="#fff" />
-        </Pressable>
-        <Pressable onPress={onBlock} style={[styles.button, styles.blockBtn]}>
-          <Ionicons name={usuario.is_blocked ? "lock-closed" : "lock-open"} size={16} color="#fff" />
-        </Pressable>
-        <Pressable onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
-          <Ionicons name="trash" size={16} color="#fff" />
-        </Pressable>
-      </View>
+      {(userRole === 'administrador' || userRole === 'empresa') && (
+        <View style={styles.actions}>
+          <Pressable onPress={onEdit} style={[styles.button, styles.editBtn]}>
+            <Ionicons name="create" size={16} color="#fff" />
+          </Pressable>
+          <Pressable onPress={onBlock} style={[styles.button, styles.blockBtn]}>
+            <Ionicons name={usuario.is_blocked ? "lock-closed" : "lock-open"} size={16} color="#fff" />
+          </Pressable>
+          <Pressable onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
+            <Ionicons name="trash" size={16} color="#fff" />
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 }

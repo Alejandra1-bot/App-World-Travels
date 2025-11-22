@@ -9,11 +9,15 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { crearUsuarios, actualizarUsuarios } from "../../Src/Navegation/Service/UsuariosService";
 import { useAppContext } from "../Configuracion/AppContext";
@@ -30,6 +34,7 @@ export default function EditarUsuario() {
   const [Email, setCorreo] = useState(usuario ? usuario.Email || usuario.Correo : "");
   const [Telefono, setTelefono] = useState(usuario ? usuario.telefono || usuario.Telefono : "");
   const [Nacionalidad, setNacionalidad] = useState(usuario ? usuario.Nacionalidad || usuario.Nacionalidad : "");
+  const [Foto_Perfil, setFotoPerfil] = useState(usuario ? usuario.Foto_Perfil || usuario.foto_perfil : "");
   const [Contrasena, setContrasena] = useState("");
   const [rol, setRol] = useState(usuario ? String(usuario.rol || usuario.Rol) : "");
   const [Fecha_Registro, setFechaRegistro] = useState(usuario ? usuario.Fecha_Registro || usuario.Fecha_Registro : new Date().toISOString().split('T')[0]);
@@ -38,6 +43,21 @@ export default function EditarUsuario() {
   const [loading, setLoading] = useState(false);
 
   const esEdicion = !!usuario;
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setFotoPerfil(uri);
+      await AsyncStorage.setItem('userPhoto', uri);
+    }
+  };
 
   useEffect(() => {
     // Comentado hasta que se implemente listarRoles
@@ -119,7 +139,7 @@ export default function EditarUsuario() {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>{esEdicion ? "Editar Usuario" : "Crear Nuevo Usuario"}</Text>
+            <Text style={styles.cardTitle}>{esEdicion ? "Editar " : "Crear Nuevo Usuario"}</Text>
             <TextInput
               style={styles.input}
               placeholder="Nombre"
@@ -152,6 +172,14 @@ export default function EditarUsuario() {
               value={Nacionalidad}
               onChangeText={setNacionalidad}
             />
+            <TouchableOpacity style={styles.input} onPress={pickImage}>
+              <Text style={{ color: Foto_Perfil ? '#000' : '#999' }}>
+                {Foto_Perfil ? 'Imagen seleccionada' : 'Seleccionar Foto de Perfil'}
+              </Text>
+            </TouchableOpacity>
+            {Foto_Perfil && (
+              <Image source={{ uri: Foto_Perfil }} style={{ width: 300, height: 300, alignSelf: 'center', marginBottom: 10, borderRadius: 150 }} />
+            )}
             <TextInput
               style={styles.input}
               placeholder="Fecha de Registro"

@@ -11,6 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { useAppContext } from "../../Screen/Configuracion/AppContext";
 import AdministradoresCard from "../../Components/AdministradoresCard";
+import { listarAdministradores, eliminarAdministrador } from "../../Src/Navegation/Service/AdministradoresService";
 
 export default function ListarAdministradores() {
   const { colors, texts, userRole } = useAppContext();
@@ -22,14 +23,12 @@ export default function ListarAdministradores() {
   const handleAdministradores = async () => {
     setLoading(true);
     try {
-      // TODO: implement service
-      // const result = await listarAdministradores();
-      // if (result.success) {
-      //   setAdministradores(result.data);
-      // } else {
-      //   Alert.alert("Error", result.message || "No se pudieron cargar los administradores");
-      // }
-      setAdministradores([]); // Placeholder
+      const result = await listarAdministradores();
+      if (result.success) {
+        setAdministradores(result.data);
+      } else {
+        Alert.alert("Error", result.message || "No se pudieron cargar los administradores");
+      }
     } catch (error) {
       Alert.alert("Error", "No se pudieron cargar los administradores");
     } finally {
@@ -61,14 +60,12 @@ export default function ListarAdministradores() {
           style: "destructive",
           onPress: async () => {
             try {
-              // TODO: implement service
-              // const result = await eliminarAdministrador(id);
-              // if (result.success) {
-              //   handleAdministradores();
-              // } else {
-              //   Alert.alert("Error", result.message || "No se pudo eliminar el administrador");
-              // }
-              Alert.alert("Info", "Función no implementada aún");
+              const result = await eliminarAdministrador(id);
+              if (result.success) {
+                handleAdministradores();
+              } else {
+                Alert.alert("Error", result.message || "No se pudo eliminar el administrador");
+              }
             } catch (error) {
               Alert.alert("Error", "No se pudo eliminar el administrador");
             }

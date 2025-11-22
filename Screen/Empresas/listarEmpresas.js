@@ -11,6 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { useAppContext } from "../../Screen/Configuracion/AppContext";
 import EmpresasCard from "../../Components/EmpresasCard";
+import { listarEmpresas, eliminarEmpresas } from "../../Src/Navegation/Service/EmpresaService";
 
 export default function ListarEmpresas() {
   const { colors, texts, userRole } = useAppContext();
@@ -22,14 +23,12 @@ export default function ListarEmpresas() {
   const handleEmpresas = async () => {
     setLoading(true);
     try {
-      // TODO: implement service
-      // const result = await listarEmpresas();
-      // if (result.success) {
-      //   setEmpresas(result.data);
-      // } else {
-      //   Alert.alert("Error", result.message || "No se pudieron cargar las empresas");
-      // }
-      setEmpresas([]); // Placeholder
+      const result = await listarEmpresas();
+      if (result.success) {
+        setEmpresas(result.data);
+      } else {
+        Alert.alert("Error", result.message || "No se pudieron cargar las empresas");
+      }
     } catch (error) {
       Alert.alert("Error", "No se pudieron cargar las empresas");
     } finally {
@@ -61,14 +60,12 @@ export default function ListarEmpresas() {
           style: "destructive",
           onPress: async () => {
             try {
-              // TODO: implement service
-              // const result = await eliminarEmpresa(id);
-              // if (result.success) {
-              //   handleEmpresas();
-              // } else {
-              //   Alert.alert("Error", result.message || "No se pudo eliminar la empresa");
-              // }
-              Alert.alert("Info", "Función no implementada aún");
+              const result = await eliminarEmpresas(id);
+              if (result.success) {
+                handleEmpresas();
+              } else {
+                Alert.alert("Error", result.message || "No se pudo eliminar la empresa");
+              }
             } catch (error) {
               Alert.alert("Error", "No se pudo eliminar la empresa");
             }

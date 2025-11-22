@@ -21,7 +21,7 @@ export default function AdministradoresStack() {
       <Stack.Screen
         name="editarAdministrador"
         component={editarAdministrador}
-        options={{ title: 'Editar Administrador' }}
+        options={{ title: 'Gestion de Administradores' }}
       />
     </Stack.Navigator>
   );

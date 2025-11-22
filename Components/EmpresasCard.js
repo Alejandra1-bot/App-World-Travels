@@ -1,86 +1,88 @@
 import { View, Text, Pressable, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function EmpresaCard({ empresa, onEdit, onDelete, userRole }) {
+export default function EmpresaCard({ empresa, onEdit, onDelete, userRole, onPress }) {
   const inicial = empresa.nombre ? empresa.nombre.charAt(0).toUpperCase() : "?";
 
   return (
-    <TouchableOpacity style={styles.card}>
-      <View style={styles.avatar}>
-        <Text style={styles.avatarText}>{inicial}</Text>
+    <View style={styles.card}>
+      <TouchableOpacity style={styles.cardContent} onPress={onPress}>
+        <View style={styles.headerRow}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{inicial}</Text>
+          </View>
+          <View style={styles.nameContainer}>
+            <Text style={styles.nombre}>{empresa.nombre}</Text>
+          </View>
+        </View>
+        <View style={styles.details}>
+          <Text style={styles.detalle}>NIT: {empresa.nit}</Text>
+          <Text style={styles.detalle}>Dirección: {empresa.direccion}</Text>
+          <Text style={styles.detalle}>Teléfono: {empresa.telefono}</Text>
+          <Text style={styles.detalle}>Email: {empresa.email}</Text>
+        </View>
+      </TouchableOpacity>
+      <View style={styles.actions}>
+        <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
+          <Ionicons name="create" size={16} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
+          <Ionicons name="trash" size={16} color="#fff" />
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.info}>
-        <Text style={styles.nombre}>{empresa.nombre}</Text>
-
-        <View style={styles.row}>
-          <Ionicons name="business-outline" size={16} color="#555" />
-          <Text style={styles.detalle}> NIT: {empresa.nit}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Ionicons name="location-outline" size={16} color="#555" />
-          <Text style={styles.detalle}> {empresa.direccion}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Ionicons name="call-outline" size={16} color="#555" />
-          <Text style={styles.detalle}> {empresa.telefono}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Ionicons name="mail-outline" size={16} color="#555" />
-          <Text style={styles.detalle}> {empresa.email}</Text>
-        </View>
-      </View>
-
-      {userRole === "administrador" && (
-        <View style={styles.actions}>
-          <Pressable onPress={onEdit} style={[styles.button, styles.editBtn]}>
-            <Ionicons name="create-outline" size={18} color="#fff" />
-          </Pressable>
-          <Pressable onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
-            <Ionicons name="trash-outline" size={18} color="#fff" />
-          </Pressable>
-        </View>
-      )}
-    </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    backgroundColor: "#f9fbff",
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 12,
     marginVertical: 8,
     marginHorizontal: 16,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    overflow: "hidden",
+  },
+  cardContent: {
+    padding: 15,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "#0a74da",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#007bff",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 15,
   },
   avatarText: { color: "#fff", fontSize: 20, fontWeight: "bold" },
-  info: { flex: 1 },
-  nombre: { fontSize: 17, fontWeight: "bold", marginBottom: 6, color: "#222" },
-  row: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
-  detalle: { fontSize: 14, color: "#444", marginLeft: 4 },
-  actions: { flexDirection: "column", marginLeft: 8 },
+  nameContainer: { flex: 1 },
+  nombre: { fontSize: 18, fontWeight: "bold", color: "#333" },
+  details: {
+    marginBottom: 10,
+  },
+  detalle: { fontSize: 14, color: "#666", marginBottom: 3 },
+  actions: {
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingVertical: 10,
+    backgroundColor: "#f0f0f0",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+  },
   button: {
-    padding: 8,
+    padding: 10,
     borderRadius: 8,
-    marginVertical: 4,
     alignItems: "center",
     justifyContent: "center",
+    marginHorizontal: 5,
   },
-  editBtn: { backgroundColor: "#0a18d6" },
-  deleteBtn: { backgroundColor: "#f20c0c" },
+  editBtn: { backgroundColor: "#007bff" },
+  deleteBtn: { backgroundColor: "#dc3545" },
 });

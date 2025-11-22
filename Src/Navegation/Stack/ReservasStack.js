@@ -21,7 +21,7 @@ export default function ReservasStack() {
       <Stack.Screen
         name="editarReservas"
         component={editarReservas}
-        options={{ title: 'Editar Reserva' }}
+        options={{ title: 'Gestion de Reservas' }}
       />
     </Stack.Navigator>
   );

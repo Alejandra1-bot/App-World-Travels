@@ -1,8 +1,16 @@
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CardComponents from '../../Components/CardComponents';
+import { useAppContext } from '../Configuracion/AppContext';
 
 export default function Modulos({ navigation }) {
+  const { logout } = useAppContext();
+
+  const handleLogout = async () => {
+    await logout();
+    navigation.reset({ index: 0, routes: [] });
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header */}
@@ -70,6 +78,12 @@ export default function Modulos({ navigation }) {
           description="Administra las empresas registradas."
           icon="business-outline"
           onPress={() => navigation.navigate('EmpresasFlow')}
+        />
+        <CardComponents
+          tittle="Cerrar Sesión"
+          description="Salir de la aplicación de forma segura."
+          icon="log-out-outline"
+          onPress={handleLogout}
         />
       </View>
     </ScrollView>

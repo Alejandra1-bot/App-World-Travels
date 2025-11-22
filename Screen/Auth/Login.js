@@ -33,7 +33,8 @@ export default function Login({ navigation }) {
         const token = result.token;
         const role = result.role || 'usuario';
         const userId = result.userId;
-        await login(token, role, userId);
+        const userEmail = result.userEmail || Email;
+        await login(token, role, userId, userEmail);
         Alert.alert("Éxito", "Inicio de sesión exitoso");
       } else {
         Alert.alert(

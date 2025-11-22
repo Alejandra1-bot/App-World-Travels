@@ -88,15 +88,19 @@ export default function DetalleAdministrador() {
           <View style={styles.infoContainer}>
             <View style={styles.infoRow}>
               <Ionicons name="mail-outline" size={20} color="#007bff" />
-              <Text style={styles.infoText}>{administrador.email || administrador.Email}</Text>
+              <Text style={styles.infoText}>{administrador.email || administrador.correo}</Text>
             </View>
             <View style={styles.infoRow}>
               <Ionicons name="call-outline" size={20} color="#007bff" />
               <Text style={styles.infoText}>{administrador.telefono || administrador.Telefono}</Text>
             </View>
             <View style={styles.infoRow}>
+              <Ionicons name="card-outline" size={20} color="#007bff" />
+              <Text style={styles.infoText}>Documento: {administrador.documento}</Text>
+            </View>
+            <View style={styles.infoRow}>
               <Ionicons name="calendar-outline" size={20} color="#007bff" />
-              <Text style={styles.infoText}>{administrador.fecha_registro || administrador.created_at}</Text>
+              <Text style={styles.infoText}>Fecha de Registro: {new Date(administrador.fecha_registro || administrador.created_at).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</Text>
             </View>
           </View>
 

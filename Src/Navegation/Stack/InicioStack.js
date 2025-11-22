@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppContext } from '../../../Screen/Configuracion/AppContext';
 
+import HomeDashboard from '../../../Screen/Inicio/HomeDashboard';
 import Modulos from '../../../Screen/Inicio/Modulos';
 import InicioAdmin from '../../../Screen/Inicio/InicioAdmin';
 import InicioEmpresa from '../../../Screen/Inicio/InicioEmpresa';
@@ -54,11 +55,11 @@ const Stack = createNativeStackNavigator();
 export default function InicioStack(){
     return(
         <Stack.Navigator>
-           
+
             <Stack.Screen
-                name="Modulos"
-                component={Modulos}
-                options={{ title: 'Módulos' }}
+                name="HomeDashboard"
+                component={HomeDashboard}
+                options={{ headerShown: false }}
             />
             <Stack.Screen
                 name="ActividadesFlow"
@@ -103,3 +104,4 @@ export default function InicioStack(){
         </Stack.Navigator>
     );
 }
+

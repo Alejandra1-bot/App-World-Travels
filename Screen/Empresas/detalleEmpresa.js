@@ -74,12 +74,12 @@ export default function DetalleEmpresa() {
           <View style={styles.header}>
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>
-                {(empresa.Nombre_Empresa || empresa.nombre_empresa || "?").charAt(0).toUpperCase()}
+                {(empresa.nombre || empresa.Nombre_Empresa || empresa.nombre_empresa || "?").charAt(0).toUpperCase()}
               </Text>
             </View>
             <View style={styles.headerText}>
               <Text style={styles.nombre}>
-                {empresa.Nombre_Empresa || empresa.nombre_empresa}
+                {empresa.nombre || empresa.Nombre_Empresa || empresa.nombre_empresa}
               </Text>
               <Text style={styles.rol}>Empresa</Text>
             </View>
@@ -101,6 +101,10 @@ export default function DetalleEmpresa() {
             <View style={styles.infoRow}>
               <Ionicons name="business-outline" size={20} color="#007bff" />
               <Text style={styles.infoText}>NIT: {empresa.NIT || empresa.nit}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Ionicons name="map-outline" size={20} color="#007bff" />
+              <Text style={styles.infoText}>Ciudad: {empresa.Ciudad || empresa.ciudad}</Text>
             </View>
           </View>
 

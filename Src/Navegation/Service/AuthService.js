@@ -2,31 +2,34 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "./Conexion";
 
 export const loginUser= async(Email, password) => {
-    try {
-          const response = await api.post('/login', {email: Email, password});
-          const token = response.data.token
-          const role = response.data.user?.role || 'usuario'; // default to paciente
-          const userId = response.data.user?.id;
-          console.log("Respuesta del servidro:", response.data);
-          console.log("Token recibido:", token);
-          console.log("Rol recibido:", role);
-          console.log("User ID recibido:", userId);
-          if (token) {
-             await AsyncStorage.setItem("userToken", token);
-             await AsyncStorage.setItem("userRole", role);
-             if (userId) await AsyncStorage.setItem("userId", userId.toString());
-        }else{
-            console.log("No se recibio el token en la respuesta");
-        }
-        return { success: true, token, role, userId };
-    }catch(error){
-        console.error("Error al iniciar sesion:", error.response ? error.response.data : error.message);
-        return {
-            success: false,
-            message: error.response ? error.response.data :"Error de Conexion",
-        };
-    }
-};
+     try {
+           const response = await api.post('/login', {email: Email, password});
+           const token = response.data.token
+           const role = response.data.user?.role || 'usuario'; // default to paciente
+           const userId = response.data.user?.id;
+           const userEmail = response.data.user?.email || Email;
+           console.log("Respuesta del servidro:", response.data);
+           console.log("Token recibido:", token);
+           console.log("Rol recibido:", role);
+           console.log("User ID recibido:", userId);
+           console.log("User Email recibido:", userEmail);
+           if (token) {
+              await AsyncStorage.setItem("userToken", token);
+              await AsyncStorage.setItem("userRole", role);
+              if (userId) await AsyncStorage.setItem("userId", userId.toString());
+              if (userEmail) await AsyncStorage.setItem("userEmail", userEmail);
+         }else{
+             console.log("No se recibio el token en la respuesta");
+         }
+         return { success: true, token, role, userId, userEmail };
+     }catch(error){
+         console.error("Error al iniciar sesion:", error.response ? error.response.data : error.message);
+         return {
+             success: false,
+             message: error.response ? error.response.data :"Error de Conexion",
+         };
+     }
+ };
 
 export const registerUser = async (userData) => {
   try {
@@ -48,6 +51,7 @@ export const logoutUser = async () => {
     await AsyncStorage.removeItem("userToken"); //  elimina el token guardado
     await AsyncStorage.removeItem("userRole"); // elimina el rol guardado
     await AsyncStorage.removeItem("userId"); // elimina el userId guardado
+    await AsyncStorage.removeItem("userEmail"); // elimina el userEmail guardado
     console.log("Sesión cerrada correctamente");
     return { success: true };
   } catch (error) {

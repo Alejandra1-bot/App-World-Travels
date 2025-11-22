@@ -14,6 +14,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { crearAdministrador, actualizarAdministrador } from "../../Src/Navegation/Service/AdministradoresService";
 import { useAppContext } from "../Configuracion/AppContext";
 
 export default function EditarAdministrador() {
@@ -25,15 +26,16 @@ export default function EditarAdministrador() {
 
   const [Nombre, setNombre] = useState(administrador ? administrador.nombre || administrador.Nombre : "");
   const [Apellido, setApellido] = useState(administrador ? administrador.apellido || administrador.Apellido : "");
-  const [Email, setCorreo] = useState(administrador ? administrador.Email || administrador.email : "");
+  const [Email, setCorreo] = useState(administrador ? administrador.correo || administrador.email : "");
   const [Telefono, setTelefono] = useState(administrador ? administrador.telefono || administrador.Telefono : "");
+  const [Documento, setDocumento] = useState(administrador ? administrador.documento || "" : "");
   const [Contrasena, setContrasena] = useState("");
   const [loading, setLoading] = useState(false);
 
   const esEdicion = !!administrador;
 
   const handleGuardar = async () => {
-    const camposRequeridos = [Nombre, Apellido, Email, Telefono];
+    const camposRequeridos = [Nombre, Apellido, Email, Telefono, Documento];
     if (!esEdicion) camposRequeridos.push(Contrasena);
 
     if (camposRequeridos.some((campo) => !campo || campo === "")) {
@@ -45,21 +47,17 @@ export default function EditarAdministrador() {
     try {
       let result;
       if (esEdicion) {
-        // TODO: implement actualizarAdministrador
-        // result = await actualizarAdministrador(administrador.id, { Nombre, Apellido, Email, Telefono });
-        Alert.alert("Info", "Función de actualización no implementada aún");
+        result = await actualizarAdministrador(administrador.id, { nombre: Nombre, apellido: Apellido, correo: Email, telefono: Telefono, documento: Documento });
       } else {
-        // TODO: implement crearAdministrador
-        // result = await crearAdministrador({ Nombre, Apellido, Email, Telefono, Contrasena });
-        Alert.alert("Info", "Función de creación no implementada aún");
+        result = await crearAdministrador({ nombre: Nombre, apellido: Apellido, correo: Email, telefono: Telefono, documento: Documento, contraseña: Contrasena });
       }
 
-      // if (result.success) {
-      //   Alert.alert("Éxito", esEdicion ? "Administrador actualizado" : "Administrador creado correctamente");
-      //   navigation.goBack();
-      // } else {
-      //   Alert.alert("Error", result.message || "No se pudo guardar el administrador");
-      // }
+      if (result.success) {
+        Alert.alert("Éxito", esEdicion ? "Administrador actualizado" : "Administrador creado correctamente");
+        navigation.goBack();
+      } else {
+        Alert.alert("Error", result.message || "No se pudo guardar el administrador");
+      }
     } catch (error) {
       Alert.alert("Error", "No se pudo guardar el administrador");
     } finally {
@@ -103,6 +101,14 @@ export default function EditarAdministrador() {
               value={Telefono}
               onChangeText={setTelefono}
               keyboardType="phone-pad"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Documento"
+              value={Documento}
+              onChangeText={setDocumento}
+                            keyboardType="phone-pad"
+
             />
 
             {!esEdicion && (

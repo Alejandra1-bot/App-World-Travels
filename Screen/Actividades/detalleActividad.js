@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Modal } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { listarMunicipios } from "../../Src/Navegation/Service/MunicipiosService";
@@ -15,6 +15,7 @@ export default function DetalleActividad() {
   const [empresas, setEmpresas] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [imageModalVisible, setImageModalVisible] = useState(false);
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -53,9 +54,11 @@ export default function DetalleActividad() {
       {/* Encabezado */}
       <View style={styles.header}>
         {actividad.Imagen && actividad.Imagen !== 'default.jpg' && (
-          <Image source={{ uri: actividad.Imagen }} style={styles.headerImage} />
+          <TouchableOpacity onPress={() => setImageModalVisible(true)}>
+            <Image source={{ uri: actividad.Imagen }} style={styles.headerImage} />
+          </TouchableOpacity>
         )}
-       
+
       </View>
 
       {/* Información */}
@@ -96,6 +99,16 @@ export default function DetalleActividad() {
         <Ionicons name="arrow-back-outline" size={22} color="#fff" />
         <Text style={styles.buttonText}> Volver</Text>
       </TouchableOpacity>
+
+      {/* Modal para imagen */}
+      <Modal visible={imageModalVisible} transparent={true} onRequestClose={() => setImageModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <TouchableOpacity style={styles.modalClose} onPress={() => setImageModalVisible(false)}>
+            <Ionicons name="close" size={30} color="#fff" />
+          </TouchableOpacity>
+          <Image source={{ uri: actividad.Imagen }} style={styles.modalImage} />
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -149,5 +162,22 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalClose: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    zIndex: 1,
+  },
+  modalImage: {
+    width: '90%',
+    height: '70%',
+    resizeMode: 'contain',
   },
 });

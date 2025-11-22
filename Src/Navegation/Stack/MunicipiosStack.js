@@ -21,7 +21,7 @@ export default function MunicipiosStack() {
       <Stack.Screen
         name="editarMunicipio"
         component={editarMunicipio}
-        options={{ title: 'Editar Municipio' }}
+        options={{ title: 'Gestion de Municipios' }}
       />
     </Stack.Navigator>
   );

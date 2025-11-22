@@ -21,7 +21,7 @@ export default function Categorias_ActividadesStack() {
       <Stack.Screen
         name="editarCategoria_Actividad"
         component={editarCategoria_Actividad}
-        options={{ title: 'Editar Categoría' }}
+        options={{ title: 'Gestion de Categorías' }}
       />
     </Stack.Navigator>
   );

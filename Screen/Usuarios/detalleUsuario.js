@@ -27,10 +27,8 @@ export default function DetalleUsuario() {
         <Text style={styles.label}>📞 Teléfono:</Text>
         <Text style={styles.value}>{usuario.Telefono}</Text>
 
-       
 
-        
-      </View>
+       </View>
 
       {/* Botón volver */}
       <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>

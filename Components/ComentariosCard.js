@@ -20,7 +20,7 @@ export default function ComentarioCard({ comentario, onEdit, onDelete, userRole 
         </View>
         <View style={styles.details}>
           <Text style={styles.detalle}>Usuario: {comentario.usuario?.Nombre || `ID: ${comentario.idUsuario}`}</Text>
-          <Text style={styles.detalle}>Actividad: {comentario.actividades?.Nombre_Actividad || `ID: ${comentario.idActividad}`}</Text>
+          <Text style={styles.detalle}>Actividad: {comentario.actividad?.Nombre_Actividad || 'Sin nombre'}</Text>
           <Text style={styles.detalle}>Comentario: {comentario.Contenido}</Text>
           <View style={[styles.detalle, { flexDirection: 'row', alignItems: 'center' }]}>
             <Text>Calificación: </Text>
