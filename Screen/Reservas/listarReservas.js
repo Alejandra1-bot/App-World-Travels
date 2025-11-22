@@ -1,20 +1,22 @@
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  ActivityIndicator, 
-  Alert, 
-  TouchableOpacity, 
-  StyleSheet 
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  Alert,
+  TouchableOpacity,
+  StyleSheet
 } from "react-native";
 import { listarReservas, eliminarReservas } from "../../Src/Navegation/Service/ReservasService";
+import { listarUsuarios } from "../../Src/Navegation/Service/UsuariosService";
 import { useNavigation } from "@react-navigation/native";
 import ReservaCard from "../../Components/ReservasCard";
 import { useEffect, useState } from "react";
 import { useAppContext } from "../../Screen/Configuracion/AppContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ListarReservas() {
-  const { colors, texts, userRole } = useAppContext();
+  const { colors, texts, userRole, userEmail } = useAppContext();
 
   const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,7 +28,31 @@ export default function ListarReservas() {
     try {
       const result = await listarReservas();
       if (result.success) {
-        setReservas(result.data);
+        let filteredReservas = result.data;
+        if (userRole === 'usuario' && userEmail) {
+          // Para usuarios regulares, filtrar solo sus reservas
+          const usuariosResult = await listarUsuarios();
+          if (usuariosResult.success) {
+            const currentUsuario = usuariosResult.data.find(u => u.Email === userEmail);
+            if (currentUsuario) {
+              filteredReservas = result.data.filter(r => r.idUsuario === currentUsuario.id);
+            }
+          }
+        }
+
+        // Filtrar por estado desde AsyncStorage
+        const filter = await AsyncStorage.getItem('reservaFilter');
+        if (filter) {
+          filteredReservas = filteredReservas.filter(r => r.Estado.toLowerCase() === filter.toLowerCase());
+          await AsyncStorage.removeItem('reservaFilter'); // Limpiar el filtro
+        }
+
+
+        // Asignar numeración secuencial
+        filteredReservas = filteredReservas.sort((a, b) => a.id - b.id);
+        filteredReservas = filteredReservas.map((r, index) => ({ ...r, numeroReserva: index + 1 }));
+
+        setReservas(filteredReservas);
       } else {
         Alert.alert("Error", result.message || "No se pudieron cargar las reservas");
       }
@@ -37,11 +63,12 @@ export default function ListarReservas() {
     }
   };
 
-  // Recargar cuando la pantalla vuelva al enfoque
+  // Recargar cuando la pantalla vuelva al enfoque o cambien los parámetros
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", handleReservas);
     return unsubscribe;
   }, [navigation]);
+
 
   // Editar
   const handleEditar = (reserva) => {
@@ -153,7 +180,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ddd",
   },
   headerTitle: { fontSize: 24, fontWeight: "600", color: "#333", textAlign: "center" },
-  listContainer: { paddingHorizontal: 16, paddingTop: 10 },
+  listContainer: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 80 },
   centered: { flex: 1, justifyContent: "center", alignItems: "center" },
   empty: { textAlign: "center", marginTop: 50, fontSize: 16, color: "#999" },
 });

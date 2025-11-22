@@ -41,8 +41,8 @@ export default function NavegacionPrincipal() {
 
   const roleModules = {
     administrador: ['Inicio', 'Perfil', 'Configuración', 'Usuarios', 'Comentarios', 'Reservas', 'Actividades', 'Categorías', 'Administradores', 'Empresas', 'Municipios'],
-    empresa: ['Inicio', 'Perfil', 'Configuración', 'Usuarios', 'Empresas', 'Actividades', 'Categorías', 'Municipios'],
-    usuario: ['Inicio', 'Perfil', 'Configuración', 'Comentarios', 'Reservas', 'Actividades', 'Categorías', 'Municipios', 'Usuarios']
+    empresa: ['Inicio', 'Perfil', 'Configuración', 'Usuarios', 'Empresas', 'Comentarios', 'Reservas', 'Actividades', 'Categorías', 'Municipios'],
+    usuario: ['Inicio', 'Perfil', 'Configuración', 'Comentarios', 'Reservas', 'Actividades', 'Categorías', 'Municipios']
   };
 
   const allowedModules = allModules.filter(module => roleModules[userRole]?.includes(module.name));
@@ -133,7 +133,7 @@ export default function NavegacionPrincipal() {
                   onPress={async () => {
                     closeMenu();
                     await logout();
-                    navigation.reset({ index: 0, routes: [] });
+                    // navigation.reset({ index: 0, routes: [] });
                   }}
                 >
                   <Ionicons name="log-out-outline" size={24} color="#d32f2f" style={styles.menuIcon} />

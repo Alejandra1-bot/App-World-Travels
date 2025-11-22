@@ -106,9 +106,11 @@ export default function ListarEmpresas() {
         }
       />
 
-      <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
-        <Text style={styles.floatingButtonText}>Nueva Empresa</Text>
-      </TouchableOpacity>
+      {userRole === 'administrador' && (
+        <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
+          <Text style={styles.floatingButtonText}>Nueva Empresa</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

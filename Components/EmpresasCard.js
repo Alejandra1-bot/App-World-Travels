@@ -22,14 +22,16 @@ export default function EmpresaCard({ empresa, onEdit, onDelete, userRole, onPre
           <Text style={styles.detalle}>Email: {empresa.email}</Text>
         </View>
       </TouchableOpacity>
-      <View style={styles.actions}>
-        <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
-          <Ionicons name="create" size={16} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
-          <Ionicons name="trash" size={16} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      {userRole === 'administrador' && (
+        <View style={styles.actions}>
+          <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
+            <Ionicons name="create" size={16} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
+            <Ionicons name="trash" size={16} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }

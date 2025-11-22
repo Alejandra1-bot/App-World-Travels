@@ -120,9 +120,11 @@ export default function ListarMunicipios() {
       />
 
       {/* Botón Crear */}
-      <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
-        <Text style={styles.floatingButtonText}>Nuevo Municipio</Text>
-      </TouchableOpacity>
+      {(userRole === 'administrador' || userRole === 'empresa') && (
+        <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
+          <Text style={styles.floatingButtonText}>Nuevo Municipio</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

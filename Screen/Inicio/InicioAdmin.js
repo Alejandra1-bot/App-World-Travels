@@ -1,8 +1,33 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import CardComponents from '../../Components/CardComponents';
+import React, { useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useAppContext } from '../Configuracion/AppContext';
+import { listarAdministradores } from '../../Src/Navegation/Service/AdministradoresService';
 
 export default function InicioAdmin({ navigation }) {
+  const { userEmail } = useAppContext();
+  const [admin, setAdmin] = useState({});
+
+  const cargarAdmin = async () => {
+    if (userEmail) {
+      const result = await listarAdministradores();
+      if (result.success) {
+        const adminData = result.data.find(a => a.Email === userEmail);
+        if (adminData) {
+          setAdmin(adminData);
+        }
+      }
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      cargarAdmin();
+    }, [userEmail])
+  );
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header */}
@@ -17,6 +42,23 @@ export default function InicioAdmin({ navigation }) {
         <View style={styles.welcomeCard}>
           <Text style={styles.welcomeText}>¡Bienvenido Administrador!</Text>
           <Text style={styles.welcomeSubtext}>Tienes acceso completo a todas las funciones del sistema</Text>
+        </View>
+      </View>
+
+      {/* Perfil del Administrador */}
+      <View style={styles.profileCard}>
+        <Text style={styles.profileTitle}>Perfil del Administrador</Text>
+        <View style={styles.profileInfo}>
+          <Ionicons name="person" size={24} color="#0A74DA" />
+          <Text style={styles.profileText}>Nombre: {admin.Nombre || 'No disponible'} {admin.Apellido || ''}</Text>
+        </View>
+        <View style={styles.profileInfo}>
+          <Ionicons name="mail" size={24} color="#0A74DA" />
+          <Text style={styles.profileText}>Email: {admin.Email || 'No disponible'}</Text>
+        </View>
+        <View style={styles.profileInfo}>
+          <Ionicons name="call" size={24} color="#0A74DA" />
+          <Text style={styles.profileText}>Teléfono: {admin.Telefono || 'No disponible'}</Text>
         </View>
       </View>
 
@@ -211,5 +253,35 @@ const styles = StyleSheet.create({
     color: '#64748B',
     textAlign: 'center',
     marginTop: 5,
+  },
+  profileCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 15,
+    marginBottom: 20,
+    marginHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  profileTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#003366',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  profileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  profileText: {
+    fontSize: 16,
+    color: '#555',
+    marginLeft: 10,
+    flex: 1,
   },
 });

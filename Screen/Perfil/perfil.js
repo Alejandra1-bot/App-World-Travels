@@ -5,6 +5,9 @@ import { useAppContext } from '../Configuracion/AppContext';
 import { listarUsuarios } from '../../Src/Navegation/Service/UsuariosService';
 import { listarComentarios } from '../../Src/Navegation/Service/ComentariosService';
 import { listarReservas } from '../../Src/Navegation/Service/ReservasService';
+import { listarAdministradores } from '../../Src/Navegation/Service/AdministradoresService';
+import { listarEmpresas } from '../../Src/Navegation/Service/EmpresaService';
+import { listarActividades } from '../../Src/Navegation/Service/ActividadService';
 import React, { useEffect, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -53,6 +56,63 @@ export default function Perfil({ navigation }) {
           calificacion: calificacionPromedio.toFixed(1)
         });
       }
+    } else if (userRole === 'administrador' && userEmail) {
+      const administradoresResult = await listarAdministradores();
+      console.log("Resultado listarAdministradores:", administradoresResult);
+      let adminData = null;
+      if (administradoresResult.success) {
+        adminData = administradoresResult.data.find(a => a.Email === userEmail || a.correo === userEmail);
+        console.log("Administrador encontrado:", adminData);
+        if (adminData) {
+          setUsuario(adminData); // Usar el mismo estado para simplicidad
+        }
+      }
+
+      // Para admin, cargar estadísticas de reservas canceladas y pendientes, y comentarios con bajas calificaciones
+      const [reservasResult, comentariosResult] = await Promise.all([
+        listarReservas(),
+        listarComentarios()
+      ]);
+      if (reservasResult.success && comentariosResult.success) {
+        const canceladas = reservasResult.data.filter(r => r.Estado.toLowerCase() === 'cancelada').length;
+        const pendientes = reservasResult.data.filter(r => r.Estado.toLowerCase() === 'pendiente').length;
+        const comentariosBajos = comentariosResult.data.filter(c => c.Calificacion === 1).length;
+        setStats({ viajes: canceladas, comentarios: comentariosBajos, calificacion: pendientes });
+      } else {
+        setStats({ viajes: 0, comentarios: 0, calificacion: 0 });
+      }
+    } else if (userRole === 'empresa' && userEmail) {
+      const empresasResult = await listarEmpresas();
+      console.log("Resultado listarEmpresas:", empresasResult);
+      let empresaData = null;
+      if (empresasResult.success) {
+        empresaData = empresasResult.data.find(e => e.email === userEmail);
+        console.log("Empresa encontrada:", empresaData);
+        if (empresaData) {
+          setUsuario(empresaData);
+        }
+      }
+
+      // Estadísticas para empresa: reservas canceladas de sus actividades
+      if (empresaData) {
+        const [actividadesResult, reservasResult, comentariosResult] = await Promise.all([
+          listarActividades(),
+          listarReservas(),
+          listarComentarios()
+        ]);
+        if (actividadesResult.success && reservasResult.success && comentariosResult.success) {
+          const empresaActividades = actividadesResult.data.filter(a => a.idEmpresa === empresaData.id);
+          const actividadIds = empresaActividades.map(a => a.id);
+          const canceladas = reservasResult.data.filter(r => actividadIds.includes(r.idActividad) && r.Estado.toLowerCase() === 'cancelada').length;
+          const pendientes = reservasResult.data.filter(r => actividadIds.includes(r.idActividad) && r.Estado.toLowerCase() === 'pendiente').length;
+          const comentariosBajos = comentariosResult.data.filter(c => actividadIds.includes(c.idActividad) && c.Calificacion === 1).length;
+          setStats({ viajes: canceladas, comentarios: comentariosBajos, calificacion: pendientes });
+        } else {
+          setStats({ viajes: 0, comentarios: 0, calificacion: 0 });
+        }
+      } else {
+        setStats({ viajes: 0, comentarios: 0, calificacion: 0 });
+      }
     }
   };
 
@@ -79,46 +139,106 @@ export default function Perfil({ navigation }) {
           source={{ uri: localPhoto || usuario.Foto_Perfil || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80&v=1' }}
           style={styles.avatar}
         />
-        <Text style={styles.name}>{usuario.Nombre || 'Usuario'} {usuario.Apellido || ''}</Text>
-        <Text style={styles.role}>Usuario Activo</Text>
+        <Text style={styles.name}>{userRole === 'empresa' ? usuario.nombre : (usuario.Nombre || usuario.nombre || 'Usuario')} {userRole !== 'empresa' ? (usuario.Apellido || usuario.apellido || '') : ''}</Text>
+        <Text style={styles.role}>{userRole === 'administrador' ? 'Administrador' : userRole === 'empresa' ? 'Empresa' : 'Usuario Activo'}</Text>
       </View>
 
       <View style={styles.infoSection}>
         <View style={styles.infoItem}>
           <Ionicons name="mail" size={24} color="#0A74DA" />
-          <Text style={styles.infoText}>{usuario.Email || 'No disponible'}</Text>
+          <Text style={styles.infoText}>{usuario.Email || usuario.correo || usuario.email || 'No disponible'}</Text>
         </View>
         <View style={styles.infoItem}>
           <Ionicons name="call" size={24} color="#0A74DA" />
-          <Text style={styles.infoText}>{usuario.Telefono || 'No disponible'}</Text>
+          <Text style={styles.infoText}>{usuario.Telefono || usuario.telefono || 'No disponible'}</Text>
         </View>
-        <View style={styles.infoItem}>
-          <Ionicons name="location" size={24} color="#0A74DA" />
-          <Text style={styles.infoText}>{usuario.Nacionalidad || 'No disponible'}</Text>
-        </View>
+        {userRole === 'empresa' ? (
+          <>
+            <View style={styles.infoItem}>
+              <Ionicons name="location" size={24} color="#0A74DA" />
+              <Text style={styles.infoText}>{usuario.ciudad || 'No disponible'}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Ionicons name="home" size={24} color="#0A74DA" />
+              <Text style={styles.infoText}>{usuario.direccion || 'No disponible'}</Text>
+            </View>
+          </>
+        ) : userRole === 'usuario' ? (
+          <View style={styles.infoItem}>
+            <Ionicons name="location" size={24} color="#0A74DA" />
+            <Text style={styles.infoText}>{usuario.Nacionalidad || 'No disponible'}</Text>
+          </View>
+        ) : (
+          <View style={styles.infoItem}>
+            <Ionicons name="card" size={24} color="#0A74DA" />
+            <Text style={styles.infoText}>{usuario.Documento || usuario.documento || 'No disponible'}</Text>
+          </View>
+        )}
         <View style={styles.infoItem}>
           <Ionicons name="star" size={24} color="#0A74DA" />
-          <Text style={styles.infoText}>Usuario Registrado</Text>
+          <Text style={styles.infoText}>{userRole === 'administrador' ? 'Administrador Registrado' : userRole === 'empresa' ? 'Empresa Registrada' : 'Usuario Registrado'}</Text>
         </View>
       </View>
 
       <View style={styles.statsSection}>
-        <TouchableOpacity style={styles.stat} onPress={() => navigation.navigate('MisReservas', { reservas: userReservas })}>
-          <Text style={styles.statNumber}>{stats.viajes}</Text>
-          <Text style={styles.statLabel}>Reservas</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.stat} onPress={() => navigation.navigate('ComentariosUsuario', { comentarios: userComentarios })}>
-          <Text style={styles.statNumber}>{stats.comentarios}</Text>
-          <Text style={styles.statLabel}>Comentarios</Text>
-        </TouchableOpacity>
-        <View style={styles.stat}>
-          <Text style={styles.statNumber}>{stats.calificacion}</Text>
-          <Text style={styles.statLabel}>Calificación</Text>
-        </View>
+        {userRole === 'usuario' ? (
+          <>
+            <TouchableOpacity style={styles.stat} onPress={() => navigation.navigate('MisReservas', { reservas: userReservas })}>
+              <Text style={styles.statNumber}>{stats.viajes}</Text>
+              <Text style={styles.statLabel}>Reservas</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.stat} onPress={() => navigation.navigate('ComentariosUsuario', { comentarios: userComentarios })}>
+              <Text style={styles.statNumber}>{stats.comentarios}</Text>
+              <Text style={styles.statLabel}>Comentarios</Text>
+            </TouchableOpacity>
+            <View style={styles.stat}>
+              <Text style={styles.statNumber}>{stats.calificacion}</Text>
+              <Text style={styles.statLabel}>Calificación</Text>
+            </View>
+          </>
+        ) : userRole === 'empresa' ? (
+          <>
+            <TouchableOpacity style={styles.stat} onPress={async () => { await AsyncStorage.setItem('reservaFilter', 'Cancelada'); navigation.navigate('ReservasStack'); }}>
+              <Text style={styles.statNumber}>{stats.viajes}</Text>
+              <Text style={styles.statLabel}>Reservas{'\n'}Canceladas</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.stat} onPress={async () => { await AsyncStorage.setItem('comentariosFilter', 'bajos'); navigation.navigate('ComentariosStack'); }}>
+              <Text style={styles.statNumber}>{stats.comentarios}</Text>
+              <Text style={styles.statLabel}>Comentarios{'\n'}Bajos</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.stat} onPress={async () => { await AsyncStorage.setItem('reservaFilter', 'pendiente'); navigation.navigate('ReservasStack'); }}>
+              <Text style={styles.statNumber}>{stats.calificacion}</Text>
+              <Text style={styles.statLabel}>Reservas{'\n'}Pendientes</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <TouchableOpacity style={styles.stat} onPress={async () => { await AsyncStorage.setItem('reservaFilter', 'Cancelada'); navigation.navigate('ReservasStack'); }}>
+              <Text style={styles.statNumber}>{stats.viajes}</Text>
+              <Text style={styles.statLabel}>Reservas{'\n'}Canceladas</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.stat} onPress={async () => { await AsyncStorage.setItem('comentariosFilter', 'bajos'); navigation.navigate('ComentariosStack'); }}>
+              <Text style={styles.statNumber}>{stats.comentarios}</Text>
+              <Text style={styles.statLabel}>Comentarios{'\n'}Bajos</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.stat} onPress={async () => { await AsyncStorage.setItem('reservaFilter', 'pendiente'); navigation.navigate('ReservasStack'); }}>
+              <Text style={styles.statNumber}>{stats.calificacion}</Text>
+              <Text style={styles.statLabel}>Reservas{'\n'}Pendientes</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
 
       <View style={styles.buttonContainer}>
-        <BottonComponent title="Editar Perfil" onPress={() => navigation.navigate('editarUsuario', { usuario })} />
+        <BottonComponent title="Editar Perfil" onPress={() => {
+          if (userRole === 'administrador') {
+            navigation.navigate('AdministradoresStack', { screen: 'editarAdministrador', params: { administrador: usuario } });
+          } else if (userRole === 'empresa') {
+            navigation.navigate('EmpresasStack', { screen: 'editarEmpresa', params: { empresa: usuario } });
+          } else {
+            navigation.navigate('editarUsuario', { usuario });
+          }
+        }} />
       </View>
      </ScrollView>
    </View>
@@ -166,7 +286,15 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#003366',
-    marginBottom: 5,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+   statLabel: {
+    fontSize: 12,
+    color: '#555',
+    marginTop: 5,
+    textAlign: 'center',
+    numberOfLines: 2,
   },
   role: {
     fontSize: 16,
@@ -217,11 +345,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#0A74DA',
   },
-  statLabel: {
-    fontSize: 14,
-    color: '#555',
-    marginTop: 5,
-  },
+ 
   buttonContainer: {
     gap: 15,
   },
@@ -303,6 +427,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
+    textAlign: 'center'
   },
   postInfo: {
     flex: 1,

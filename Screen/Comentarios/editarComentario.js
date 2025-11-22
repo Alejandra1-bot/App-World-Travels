@@ -19,6 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { crearComentarios, actualizarComentarios } from "../../Src/Navegation/Service/ComentariosService";
 import { listarUsuarios } from "../../Src/Navegation/Service/UsuariosService";
 import { listarActividades } from "../../Src/Navegation/Service/ActividadService";
+import { listarReservas } from "../../Src/Navegation/Service/ReservasService";
 
 import { useAppContext } from "../Configuracion/AppContext";
 
@@ -27,7 +28,7 @@ export default function EditarComentario() {
   const route = useRoute();
 
   const comentario = route.params?.comentario;
-  const { colors, texts, userRole } = useAppContext();
+  const { colors, texts, userRole, userEmail } = useAppContext();
 
   const [Contenido, setContenido] = useState(comentario ? comentario.Contenido || "" : "");
   const [Calificacion, setCalificacion] = useState(comentario ? comentario.Calificacion || 1 : 1);
@@ -50,14 +51,39 @@ export default function EditarComentario() {
         const resUsuarios = await listarUsuarios();
         const resActividades = await listarActividades();
 
-        if (resUsuarios.success) setUsuarios(resUsuarios.data);
-        if (resActividades.success) setActividades(resActividades.data);
+        if (resUsuarios.success) {
+          setUsuarios(resUsuarios.data);
+          // Si es usuario regular y no es edición, setear el usuario actual
+          if (userRole === 'usuario' && !esEdicion && userEmail) {
+            const currentUsuario = resUsuarios.data.find(u => u.Email === userEmail);
+            if (currentUsuario) {
+              setIdUsuario(currentUsuario.id);
+            }
+          }
+        }
+
+        if (resActividades.success) {
+          let filteredActividades = resActividades.data;
+          // Si es usuario regular, filtrar actividades con reservas
+          if (userRole === 'usuario' && userEmail) {
+            const resReservas = await listarReservas();
+            if (resReservas.success) {
+              const currentUsuario = resUsuarios.success ? resUsuarios.data.find(u => u.Email === userEmail) : null;
+              if (currentUsuario) {
+                const userReservas = resReservas.data.filter(r => r.idUsuario === currentUsuario.id);
+                const activityIds = userReservas.map(r => r.idActividad);
+                filteredActividades = resActividades.data.filter(a => activityIds.includes(a.id));
+              }
+            }
+          }
+          setActividades(filteredActividades);
+        }
       } catch (error) {
         Alert.alert("Error", "No se pudieron cargar los datos relacionados.");
       }
     };
     fetchData();
-  }, []);
+  }, [userRole, userEmail, esEdicion]);
 
   // Guardar o actualizar
   const handleGuardar = async () => {
@@ -169,20 +195,22 @@ export default function EditarComentario() {
               onChangeText={setFechaComentario}
             />
 
-            <View style={styles.pickerContainer}>
-              <Text style={styles.label}>Usuario</Text>
-              <TouchableOpacity
-                style={styles.pickerTouchable}
-                onPress={() => {
-                  setModalType('usuario');
-                  setModalVisible(true);
-                }}
-              >
-                <Text style={styles.pickerText}>
-                  {idUsuario ? usuarios.find(u => u.id === idUsuario)?.Nombre || 'Usuario seleccionado' : 'Seleccionar Usuario'}
-                </Text>
-              </TouchableOpacity>
-            </View>
+            {userRole !== 'usuario' && (
+              <View style={styles.pickerContainer}>
+                <Text style={styles.label}>Usuario</Text>
+                <TouchableOpacity
+                  style={styles.pickerTouchable}
+                  onPress={() => {
+                    setModalType('usuario');
+                    setModalVisible(true);
+                  }}
+                >
+                  <Text style={styles.pickerText}>
+                    {idUsuario ? usuarios.find(u => u.id === idUsuario)?.Nombre || 'Usuario seleccionado' : 'Seleccionar Usuario'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
             <View style={styles.pickerContainer}>
               <Text style={styles.label}>Actividad</Text>

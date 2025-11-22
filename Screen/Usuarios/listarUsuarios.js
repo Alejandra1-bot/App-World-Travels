@@ -136,7 +136,7 @@ export default function ListarUsuarios() {
         }
       />
 
-      {(userRole === 'administrador' || userRole === 'empresa') && (
+      {userRole === 'administrador' && (
         <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
           <Text style={styles.floatingButtonText}>Nuevo Usuario</Text>
         </TouchableOpacity>

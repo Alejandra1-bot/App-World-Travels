@@ -110,9 +110,11 @@ export default function ListarCategoria_Actividad() {
         }
       />
 
-      <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
-        <Text style={styles.floatingButtonText}>Nueva Categoría</Text>
-      </TouchableOpacity>
+      {(userRole === 'administrador' || userRole === 'empresa') && (
+        <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
+          <Text style={styles.floatingButtonText}>Nueva Categoría</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

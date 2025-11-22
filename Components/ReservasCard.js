@@ -2,7 +2,7 @@ import { View, Text, Pressable, StyleSheet, TouchableOpacity } from "react-nativ
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-export default function ReservaCard({ reserva, onCancel, userRole, onPress }) {
+export default function ReservaCard({ reserva, onCancel, onEdit, onDelete, userRole, onPress }) {
   const navigation = useNavigation();
   const inicial = reserva.nombreUsuario ? reserva.nombreUsuario.charAt(0).toUpperCase() : "?";
 
@@ -14,7 +14,7 @@ export default function ReservaCard({ reserva, onCancel, userRole, onPress }) {
             <Text style={styles.avatarText}>{inicial}</Text>
           </View>
           <View style={styles.nameContainer}>
-            <Text style={styles.nombre}>Reserva de {reserva.nombreUsuario} #{reserva.id}</Text>
+            <Text style={styles.nombre} numberOfLines={1}>Reserva de {reserva.nombreUsuario} #{reserva.numeroReserva}</Text>
           </View>
         </View>
         <View style={styles.details}>
@@ -25,9 +25,20 @@ export default function ReservaCard({ reserva, onCancel, userRole, onPress }) {
         </View>
       </TouchableOpacity>
       <View style={styles.actions}>
-        <TouchableOpacity onPress={onCancel} style={[styles.button, styles.cancelBtn]}>
-          <Ionicons name="close-circle" size={16} color="#fff" />
-        </TouchableOpacity>
+        {userRole === 'usuario' ? (
+          <TouchableOpacity onPress={onCancel} style={[styles.button, styles.cancelBtn]}>
+            <Ionicons name="close-circle" size={16} color="#fff" />
+          </TouchableOpacity>
+        ) : (
+          <>
+            <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
+              <Ionicons name="create" size={16} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
+              <Ionicons name="trash" size={16} color="#fff" />
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </View>
   );
@@ -83,5 +94,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   cancelBtn: { backgroundColor: "#ff6b35" },
+  editBtn: { backgroundColor: "#007bff" },
+  deleteBtn: { backgroundColor: "#dc3545" },
 });
 

@@ -11,7 +11,7 @@ export default function Registro({ navigation }) {
   const [Email, setEmail] = useState('');
   const [Nacionalidad, setNacionalidad] = useState('');
   const [password, setPassword] = useState('');
-  const [roles, setRol] = useState('usuario');
+  const [role, setRol] = useState('usuario');
   const [NombreEmpresa, setNombreEmpresa] = useState('');
   const [NitEmpresa, setNitEmpresa] = useState('');
   const [DireccionEmpresa, setDireccionEmpresa] = useState('');
@@ -38,22 +38,22 @@ export default function Registro({ navigation }) {
      empresa: 'EMPRESA2025'
    };
 
-   if (roles === 'administrador' || roles === 'empresa') {
+   if (role === 'administrador' || role=== 'empresa') {
      if (!accessCode) {
-       Alert.alert("Error", `Se requiere un código de acceso único para el rol de ${roles === 'administrador' ? 'Administrador' : 'Empresa'}.`);
+       Alert.alert("Error", `Se requiere un código de acceso único para el rol de ${role === 'administrador' ? 'Administrador' : 'Empresa'}.`);
        return;
      }
-     if (accessCode !== validCodes[roles]) {
-       Alert.alert("Error", `Código de acceso incorrecto para el rol de ${roles === 'administrador' ? 'Administrador' : 'Empresa'}.`);
+     if (accessCode !== validCodes[role]) {
+       Alert.alert("Error", `Código de acceso incorrecto para el rol de ${role === 'administrador' ? 'Administrador' : 'Empresa'}.`);
        return;
      }
    }
 
-   const requiredFields = roles === 'administrador'
-     ? [Nombre, Apellido, Telefono, Email, password, roles]
-     : roles === 'empresa'
-     ? [NombreEmpresa, NitEmpresa, DireccionEmpresa, CiudadEmpresa, Email, password, roles]
-     : [Nombre, Apellido, Telefono, Email, Nacionalidad, password, roles];
+   const requiredFields = role === 'administrador'
+     ? [Nombre, Apellido, Telefono, Email, password, role]
+     : role === 'empresa'
+     ? [NombreEmpresa, NitEmpresa, DireccionEmpresa, CiudadEmpresa, Email, password, role]
+     : [Nombre, Apellido, Telefono, Email, Nacionalidad, password, role];
 
    if (requiredFields.some(field => !field)) {
      Alert.alert("Error", "Por favor, completa todos los campos requeridos, incluyendo el rol.");
@@ -61,21 +61,21 @@ export default function Registro({ navigation }) {
    }
    setLoading(true);
    const userData = {
-     ...(roles === 'empresa' ? {
+     ...(role === 'empresa' ? {
        NombreEmpresa,
        NitEmpresa,
        DireccionEmpresa,
        CiudadEmpresa,
        Email,
        password,
-       roles,
-     } : roles === 'administrador' ? {
+       role,
+     } : role === 'administrador' ? {
        Nombre,
        Apellido,
        Telefono,
        Email,
        password,
-       roles,
+       role,
      } : {
        Nombre,
        Apellido,
@@ -83,7 +83,7 @@ export default function Registro({ navigation }) {
        Email,
        Nacionalidad,
        password,
-       roles,
+       role,
      }),
    };
 
@@ -122,7 +122,7 @@ export default function Registro({ navigation }) {
         </Text>
 
 
-        {roles !== 'empresa' && (
+        {role !== 'empresa' && (
           <>
             <TextInput
               style={styles.input}
@@ -154,7 +154,7 @@ export default function Registro({ navigation }) {
               autoCapitalize="none"
             />
 
-            {roles === 'usuario' && (
+            {role === 'usuario' && (
               <TextInput
                 style={styles.input}
                 placeholder="Nacionalidad"
@@ -166,7 +166,7 @@ export default function Registro({ navigation }) {
         )}
 
 
-        {roles === 'empresa' && (
+        {role === 'empresa' && (
           <>
             <TextInput
               style={styles.input}
@@ -219,7 +219,7 @@ export default function Registro({ navigation }) {
 
         <View style={styles.pickerContainer}>
           <Picker
-            selectedValue={roles}
+            selectedValue={role}
             onValueChange={(itemValue) => setRol(itemValue)}
             style={styles.picker}
           >
@@ -229,7 +229,7 @@ export default function Registro({ navigation }) {
           </Picker>
         </View>
 
-        {(roles === 'administrador' || roles === 'empresa') && (
+        {(role === 'administrador' || role === 'empresa') && (
           <TextInput
             style={styles.input}
             placeholder="Código de acceso"

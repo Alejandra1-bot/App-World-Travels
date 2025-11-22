@@ -24,7 +24,7 @@ export default function UsuarioCard({ usuario, onEdit, onDelete, onBlock, userRo
           <Text style={styles.detalle}>Teléfono: {usuario.Telefono}</Text>
         </View>
       </TouchableOpacity>
-      {(userRole === 'administrador' || userRole === 'empresa') && (
+      {userRole === 'administrador' && (
         <View style={styles.actions}>
           <Pressable onPress={onEdit} style={[styles.button, styles.editBtn]}>
             <Ionicons name="create" size={16} color="#fff" />

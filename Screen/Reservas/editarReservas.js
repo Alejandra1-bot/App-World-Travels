@@ -16,7 +16,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { crearReservas, actualizarReservas } from "../../Src/Navegation/Service/ReservasService";
+import { crearReservas, actualizarReservas, listarReservas } from "../../Src/Navegation/Service/ReservasService";
 import { listarUsuarios } from "../../Src/Navegation/Service/UsuariosService";
 import { listarActividades } from "../../Src/Navegation/Service/ActividadService";
 
@@ -27,7 +27,7 @@ export default function EditarReserva() {
   const route = useRoute();
 
   const reserva = route.params?.reserva;
-  const { colors, texts, userRole } = useAppContext();
+  const { colors, texts, userRole, userId, userEmail } = useAppContext();
 
   const [fecha_Reserva, setFechaReserva] = useState(
     reserva ? reserva.Fecha_Reserva || "" : ""
@@ -54,7 +54,16 @@ export default function EditarReserva() {
     const fetchData = async () => {
       try {
         const resUsuarios = await listarUsuarios();
-        if (resUsuarios.success) setUsuarios(resUsuarios.data);
+        if (resUsuarios.success) {
+          setUsuarios(resUsuarios.data);
+          // Si es usuario regular y no es edición, setear el usuario actual
+          if (userRole === 'usuario' && !esEdicion && userEmail) {
+            const currentUsuario = resUsuarios.data.find(u => u.Email === userEmail);
+            if (currentUsuario) {
+              setIdUsuario(currentUsuario.id);
+            }
+          }
+        }
       } catch (error) {
         console.error("Error cargando usuarios:", error);
       }
@@ -66,7 +75,7 @@ export default function EditarReserva() {
       }
     };
     fetchData();
-  }, []);
+  }, [userRole, userEmail, esEdicion]);
 
   // Guardar o actualizar
   const handleGuardar = async () => {
@@ -75,37 +84,79 @@ export default function EditarReserva() {
       return;
     }
 
-    setLoading(true);
-    try {
-      let result;
-      const data = {
-        Fecha_Reserva: fecha_Reserva,
-        Numero_Personas: parseInt(Numero_Personas),
-        Estado,
-        idUsuario,
-        idActividad,
-      };
-
-      if (esEdicion) {
-        result = await actualizarReservas(reserva.id, data);
-      } else {
-        result = await crearReservas(data);
-      }
-
-      if (result.success) {
-        Alert.alert(
-          "Éxito",
-          esEdicion ? "Reserva actualizada" : "Reserva creada correctamente"
-        );
-        navigation.goBack();
-      } else {
-        Alert.alert("Error", result.message || "No se pudo guardar la reserva");
-      }
-    } catch (error) {
-      Alert.alert("Error", "Error al guardar la reserva");
-    } finally {
-      setLoading(false);
+    // Validar disponibilidad de cupos
+    const actividadSeleccionada = actividades.find(a => a.id === idActividad);
+    if (!actividadSeleccionada) {
+      Alert.alert("Error", "Actividad no encontrada.");
+      return;
     }
+
+    const cupoMaximo = actividadSeleccionada.Cupo_Maximo || actividadSeleccionada.cupoMaximo;
+    const reservasResult = await listarReservas();
+    if (reservasResult.success) {
+      const reservasActividad = reservasResult.data.filter(r => r.idActividad === idActividad && r.Estado.toLowerCase() !== 'cancelada');
+      const personasReservadas = reservasActividad.reduce((sum, r) => sum + r.Numero_Personas, 0);
+      const personasNuevas = parseInt(Numero_Personas);
+      if (esEdicion) {
+        // Restar las personas de la reserva actual si está editando
+        const reservaActual = reservasActividad.find(r => r.id === reserva.id);
+        if (reservaActual) {
+          personasReservadas -= reservaActual.Numero_Personas;
+        }
+      }
+      if (personasReservadas + personasNuevas > cupoMaximo) {
+        Alert.alert("Error", `No hay suficientes cupos disponibles. Cupos restantes: ${cupoMaximo - personasReservadas}`);
+        return;
+      }
+    } else {
+      Alert.alert("Error", "No se pudo verificar la disponibilidad de cupos.");
+      return;
+    }
+
+    // Mostrar confirmación
+    Alert.alert(
+      "Confirmar Reserva",
+      `¿Estás seguro de ${esEdicion ? 'actualizar' : 'crear'} esta reserva para ${Numero_Personas} persona(s) en la actividad "${actividadSeleccionada.Nombre_Actividad || actividadSeleccionada.nombre}"?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Confirmar",
+          onPress: async () => {
+            setLoading(true);
+            try {
+              let result;
+              const data = {
+                Fecha_Reserva: fecha_Reserva,
+                Numero_Personas: parseInt(Numero_Personas),
+                Estado,
+                idUsuario,
+                idActividad,
+              };
+
+              if (esEdicion) {
+                result = await actualizarReservas(reserva.id, data);
+              } else {
+                result = await crearReservas(data);
+              }
+
+              if (result.success) {
+                Alert.alert(
+                  "Éxito",
+                  esEdicion ? "Reserva actualizada" : "Reserva creada correctamente"
+                );
+                navigation.goBack();
+              } else {
+                Alert.alert("Error", result.message || "No se pudo guardar la reserva");
+              }
+            } catch (error) {
+              Alert.alert("Error", "Error al guardar la reserva");
+            } finally {
+              setLoading(false);
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -151,20 +202,22 @@ export default function EditarReserva() {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.pickerContainer}>
-              <Text style={styles.label}>Usuario</Text>
-              <TouchableOpacity
-                style={styles.pickerTouchable}
-                onPress={() => {
-                  setModalType('usuario');
-                  setModalVisible(true);
-                }}
-              >
-                <Text style={styles.pickerText}>
-                  {idUsuario ? usuarios.find(u => u.id === idUsuario)?.Nombre || 'Usuario seleccionado' : 'Seleccionar Usuario'}
-                </Text>
-              </TouchableOpacity>
-            </View>
+            {userRole !== 'usuario' && (
+              <View style={styles.pickerContainer}>
+                <Text style={styles.label}>Usuario</Text>
+                <TouchableOpacity
+                  style={styles.pickerTouchable}
+                  onPress={() => {
+                    setModalType('usuario');
+                    setModalVisible(true);
+                  }}
+                >
+                  <Text style={styles.pickerText}>
+                    {idUsuario ? usuarios.find(u => u.id === idUsuario)?.Nombre || 'Usuario seleccionado' : 'Seleccionar Usuario'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
             <View style={styles.pickerContainer}>
               <Text style={styles.label}>Actividad</Text>

@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { listarActividades, eliminarActividad } from "../../Src/Navegation/Service/ActividadService";
 import { listarCategorias } from "../../Src/Navegation/Service/CategoriasService";
+import { listarReservas } from "../../Src/Navegation/Service/ReservasService";
 import { useNavigation } from "@react-navigation/native";
 import ActividadCard from "../../Components/ActividadCard";
 import { useEffect, useState } from "react";
@@ -19,20 +20,29 @@ export default function ListarActividades() {
 
   const [actividades, setActividades] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const [reservasCount, setReservasCount] = useState({});
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   const handleActividades = async () => {
     setLoading(true);
     try {
-      const [actividadesResult, categoriasResult] = await Promise.all([
+      const [actividadesResult, categoriasResult, reservasResult] = await Promise.all([
         listarActividades(),
-        listarCategorias()
+        listarCategorias(),
+        listarReservas()
       ]);
 
       if (actividadesResult.success) {
         setActividades(actividadesResult.data);
         if (categoriasResult.success) setCategorias(categoriasResult.data);
+        if (reservasResult.success) {
+          const countMap = {};
+          reservasResult.data.forEach(reserva => {
+            countMap[reserva.idActividad] = (countMap[reserva.idActividad] || 0) + 1;
+          });
+          setReservasCount(countMap);
+        }
       } else {
         Alert.alert("Error", JSON.stringify(actividadesResult.message));
       }
@@ -106,6 +116,7 @@ export default function ListarActividades() {
             onEdit={() => handleEditar(item)}
             onDelete={() => { console.log('Delete pressed', item.id); handleEliminar(item.id); }}
             userRole={userRole}
+            numReservas={reservasCount[item.id] || 0}
             onPress={() => navigation.navigate("detalleActividad", {
               actividad: item,
               categorias: categorias,
@@ -117,9 +128,11 @@ export default function ListarActividades() {
         }
       />
 
-      <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
-        <Text style={styles.floatingButtonText}>Nueva Actividad</Text>
-      </TouchableOpacity>
+      {(userRole === 'administrador' || userRole === 'empresa') && (
+        <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
+          <Text style={styles.floatingButtonText}>Nueva Actividad</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

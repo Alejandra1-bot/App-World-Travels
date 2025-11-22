@@ -21,14 +21,16 @@ export default function CategoriaCard({ categoria, onEdit, onDelete, userRole, o
           <Text style={styles.detalle}>Descripción: {categoria.Descripcion}</Text>
         </View>
       </TouchableOpacity>
-      <View style={styles.actions}>
-        <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
-          <Ionicons name="create" size={16} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
-          <Ionicons name="trash" size={16} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      {(userRole === 'administrador' || userRole === 'empresa') && (
+        <View style={styles.actions}>
+          <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
+            <Ionicons name="create" size={16} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
+            <Ionicons name="trash" size={16} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }

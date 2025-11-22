@@ -2,7 +2,7 @@ import { View, Text, Pressable, StyleSheet, TouchableOpacity } from "react-nativ
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-export default function ActividadCard({ actividad, onEdit, onDelete, userRole, onPress }) {
+export default function ActividadCard({ actividad, onEdit, onDelete, userRole, numReservas, onPress }) {
   const navigation = useNavigation();
   const nombre = actividad.Nombre_Actividad || actividad.nombre;
   const inicial = nombre ? nombre.charAt(0).toUpperCase() : "?";
@@ -26,6 +26,7 @@ export default function ActividadCard({ actividad, onEdit, onDelete, userRole, o
           <Text style={styles.detalle}>Ubicación: {actividad.Ubicacion || actividad.ubicacion}</Text>
           <Text style={styles.detalle}>Precio: ${actividad.Precio || actividad.precio}</Text>
           <Text style={styles.detalle}>Fecha: {actividad.Fecha_Actividad || actividad.fecha}</Text>
+          <Text style={styles.detalle}>{numReservas === 0 ? 'Sin reservas' : `Reservas: ${numReservas}`}</Text>
         </View>
       </TouchableOpacity>
       {(userRole === 'administrador' || userRole === 'empresa') && (

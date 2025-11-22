@@ -36,14 +36,16 @@ export default function ComentarioCard({ comentario, onEdit, onDelete, userRole 
           <Text style={styles.detalle}>Fecha: {comentario.Fecha_Comentario}</Text>
         </View>
       </TouchableOpacity>
-      <View style={styles.actions}>
-        <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
-          <Ionicons name="create" size={16} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
-          <Ionicons name="trash" size={16} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      {userRole === 'administrador' && (
+        <View style={styles.actions}>
+          <TouchableOpacity onPress={onEdit} style={[styles.button, styles.editBtn]}>
+            <Ionicons name="create" size={16} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onDelete} style={[styles.button, styles.deleteBtn]}>
+            <Ionicons name="trash" size={16} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }

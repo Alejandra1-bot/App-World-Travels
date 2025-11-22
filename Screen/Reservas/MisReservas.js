@@ -5,7 +5,10 @@ import { actualizarReservas } from '../../Src/Navegation/Service/ReservasService
 
 export default function MisReservas({ navigation }) {
   const route = useRoute();
-  const { reservas, onUpdate } = route.params || { reservas: [] };
+  const { reservas: rawReservas, onUpdate } = route.params || { reservas: [] };
+
+  // Asignar numeración a las reservas
+  const reservas = rawReservas.map((r, index) => ({ ...r, numeroReserva: index + 1 }));
 
   const handleCancel = async (reservaId) => {
     Alert.alert(

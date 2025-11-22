@@ -4,7 +4,7 @@ import CardComponents from '../../Components/CardComponents';
 import { useAppContext } from '../Configuracion/AppContext';
 
 export default function Modulos({ navigation }) {
-  const { logout } = useAppContext();
+  const { logout, userRole } = useAppContext();
 
   const handleLogout = async () => {
     await logout();
@@ -30,61 +30,100 @@ export default function Modulos({ navigation }) {
 
       <Text style={styles.sectionTitle}>Módulos Disponibles</Text>
       <View style={styles.gridContainer}>
-        <CardComponents
-          tittle="Actividades Turísticas"
-          description="Crea y gestiona experiencias inolvidables para tus clientes."
-          icon="airplane-outline"
-          onPress={() => navigation.navigate('ActividadesFlow')}
-        />
-       
-        <CardComponents
-          tittle="Comentarios"
-          description="Gestiona las reseñas y feedback de los viajeros."
-          icon="chatbubble-outline"
-          onPress={() => navigation.navigate('ComentariosFlow')}
-        />
-        <CardComponents
-          tittle="Categorías"
-          description="Organiza las actividades por tipo y temática."
-          icon="list-outline"
-          onPress={() => navigation.navigate('Categorias_ActividadesFlow')}
-        />
-        <CardComponents
-          tittle="Reservas"
-          description="Controla todas las reservas y bookings de viajes."
-          icon="calendar-outline"
-          onPress={() => navigation.navigate('ReservasFlow')}
-        />
-        <CardComponents
-          tittle="Municipios"
-          description="Gestiona las ciudades y pueblos turísticos."
-          icon="location-outline"
-          onPress={() => navigation.navigate('MunicipiosFlow')}
-        />
-        <CardComponents
-          tittle="Usuarios"
-          description="Administra clientes, empresas y administradores."
-          icon="people-outline"
-          onPress={() => navigation.navigate('UsuariosFlow')}
-        />
-        <CardComponents
-          tittle="Administradores"
-          description="Gestiona los administradores del sistema."
-          icon="shield-checkmark-outline"
-          onPress={() => navigation.navigate('AdministradoresFlow')}
-        />
-        <CardComponents
-          tittle="Empresas"
-          description="Administra las empresas registradas."
-          icon="business-outline"
-          onPress={() => navigation.navigate('EmpresasFlow')}
-        />
-        <CardComponents
-          tittle="Cerrar Sesión"
-          description="Salir de la aplicación de forma segura."
-          icon="log-out-outline"
-          onPress={handleLogout}
-        />
+        {userRole === 'empresa' ? (
+          <>
+            <CardComponents
+              tittle="Usuarios"
+              description="Administra clientes, empresas y administradores."
+              icon="people-outline"
+              onPress={() => navigation.navigate('UsuariosFlow')}
+            />
+            <CardComponents
+              tittle="Empresas"
+              description="Lista de empresas registradas."
+              icon="business-outline"
+              onPress={() => navigation.navigate('EmpresasFlow')}
+            />
+            <CardComponents
+              tittle="Reservas"
+              description="Controla todas las reservas y bookings de viajes."
+              icon="calendar-outline"
+              onPress={() => navigation.navigate('ReservasFlow')}
+            />
+            <CardComponents
+              tittle="Comentarios"
+              description="Gestiona las reseñas y feedback de los viajeros."
+              icon="chatbubble-outline"
+              onPress={() => navigation.navigate('ComentariosFlow')}
+            />
+            <CardComponents
+              tittle="Cerrar Sesión"
+              description="Salir de la aplicación de forma segura."
+              icon="log-out-outline"
+              onPress={handleLogout}
+            />
+          </>
+        ) : (
+          <>
+            <CardComponents
+              tittle="Actividades Turísticas"
+              description="Crea y gestiona experiencias inolvidables para tus clientes."
+              icon="airplane-outline"
+              onPress={() => navigation.navigate('ActividadesFlow')}
+            />
+
+            <CardComponents
+              tittle="Comentarios"
+              description="Gestiona las reseñas y feedback de los viajeros."
+              icon="chatbubble-outline"
+              onPress={() => navigation.navigate('ComentariosFlow')}
+            />
+            <CardComponents
+              tittle="Categorías"
+              description="Organiza las actividades por tipo y temática."
+              icon="list-outline"
+              onPress={() => navigation.navigate('Categorias_ActividadesFlow')}
+            />
+            <CardComponents
+              tittle="Reservas"
+              description="Controla todas las reservas y bookings de viajes."
+              icon="calendar-outline"
+              onPress={() => navigation.navigate('ReservasFlow')}
+            />
+            <CardComponents
+              tittle="Municipios"
+              description="Gestiona las ciudades y pueblos turísticos."
+              icon="location-outline"
+              onPress={() => navigation.navigate('MunicipiosFlow')}
+            />
+            {userRole !== 'usuario' && (
+              <CardComponents
+                tittle="Usuarios"
+                description="Administra clientes, empresas y administradores."
+                icon="people-outline"
+                onPress={() => navigation.navigate('UsuariosFlow')}
+              />
+            )}
+            <CardComponents
+              tittle="Administradores"
+              description="Gestiona los administradores del sistema."
+              icon="shield-checkmark-outline"
+              onPress={() => navigation.navigate('AdministradoresFlow')}
+            />
+            <CardComponents
+              tittle="Empresas"
+              description="Administra las empresas registradas."
+              icon="business-outline"
+              onPress={() => navigation.navigate('EmpresasFlow')}
+            />
+            <CardComponents
+              tittle="Cerrar Sesión"
+              description="Salir de la aplicación de forma segura."
+              icon="log-out-outline"
+              onPress={handleLogout}
+            />
+          </>
+        )}
       </View>
     </ScrollView>
   );

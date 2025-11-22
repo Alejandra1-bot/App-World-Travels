@@ -8,13 +8,16 @@ import {
   StyleSheet 
 } from "react-native";
 import { listarComentarios, eliminarComentarios } from "../../Src/Navegation/Service/ComentariosService";
+import { listarActividades } from "../../Src/Navegation/Service/ActividadService";
+import { listarEmpresas } from "../../Src/Navegation/Service/EmpresaService";
 import { useNavigation } from "@react-navigation/native";
 import ComentarioCard from "../../Components/ComentariosCard";
 import { useEffect, useState } from "react";
 import { useAppContext } from "../../Screen/Configuracion/AppContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ListarComentarios() {
-  const { colors, texts, userRole } = useAppContext();
+  const { colors, texts, userRole, userEmail } = useAppContext();
 
   const [comentarios, setComentarios] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,7 +29,32 @@ export default function ListarComentarios() {
     try {
       const result = await listarComentarios();
       if (result.success) {
-        setComentarios(result.data);
+        let filteredComentarios = result.data;
+
+        if (userRole === 'empresa' && userEmail) {
+          // Filtrar comentarios de actividades de la empresa
+          const [actividadesResult, empresasResult] = await Promise.all([
+            listarActividades(),
+            listarEmpresas()
+          ]);
+          if (actividadesResult.success && empresasResult.success) {
+            const currentEmpresa = empresasResult.data.find(e => e.email === userEmail);
+            if (currentEmpresa) {
+              const empresaActividades = actividadesResult.data.filter(a => a.idEmpresa === currentEmpresa.id);
+              const actividadIds = empresaActividades.map(a => a.id);
+              filteredComentarios = filteredComentarios.filter(c => actividadIds.includes(c.idActividad));
+            }
+          }
+        }
+
+        // Filtrar por calificación baja desde AsyncStorage
+        const filter = await AsyncStorage.getItem('comentariosFilter');
+        if (filter === 'bajos') {
+          filteredComentarios = filteredComentarios.filter(c => c.Calificacion === 1);
+          await AsyncStorage.removeItem('comentariosFilter'); // Limpiar el filtro
+        }
+
+        setComentarios(filteredComentarios);
       } else {
         Alert.alert("Error", result.message || "No se pudieron cargar los comentarios");
       }
@@ -118,9 +146,11 @@ export default function ListarComentarios() {
       />
 
       {/* Botón Crear */}
-      <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
-        <Text style={styles.floatingButtonText}>Nuevo Comentario</Text>
-      </TouchableOpacity>
+      {userRole === 'administrador' && (
+        <TouchableOpacity style={styles.floatingButton} onPress={handleCrear}>
+          <Text style={styles.floatingButtonText}>Nuevo Comentario</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
